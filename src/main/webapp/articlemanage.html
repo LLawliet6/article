@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta http-equiv="Cache-Control" content="no-store" />
+    <title>Clickaholic</title>
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+    <link rel="stylesheet" href="css/main.css">
+    <script src="js/jquery-3.6.0.min.js"></script>
+    <style>
+        /*页脚*/
+        /* 固定 footer 到页面底部 */
+        #usmanage {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background-color: #fff;  /* 设置背景色 */
+            box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.1); /* 可选：添加阴影 */
+            z-index: 1000;  /* 确保 footer 在最上层 */
+        }
+        .footer-bottom {
+            padding: 10px 0;
+        }
+        ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            text-align: center;
+        }
+        li {
+            display: inline;
+            margin: 0 10px;
+        }
+        li.hidden {
+            display: inline-block;
+        }
+        a {
+            text-decoration: none;
+            color: #333;
+        }
+        
+        .article-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            font-size: 16px;
+            text-align: left;
+        }
+
+        .article-table thead {
+            background-color: #f4f4f4;
+        }
+
+        .article-table th, .article-table td {
+            border: 1px solid #ddd;
+            padding: 10px;
+        }
+
+        .article-table tr:hover {
+            background-color: #f9f9f9;
+        }
+
+        .article-table td button {
+            margin-right: 5px;
+            padding: 5px 10px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .article-table td button.edit-btn {
+            background-color: #5bc0de;
+            color: white;
+        }
+
+        .article-table td button.delete-btn {
+            background-color: #d9534f;
+            color: white;
+        }
+        /*分页*/
+        .pagination {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-top: 20px;
+        }
+
+        .pagination button {
+            border: 1px solid #ddd;
+            background-color: #fff;
+            color: #333;
+            padding: 5px 10px;
+            margin: 0 5px;
+            cursor: pointer;
+            border-radius: 4px;
+            font-size: 14px;
+            transition: all 0.3s;
+        }
+
+        .pagination button:hover {
+            background-color: #f0f0f0;
+        }
+
+        .pagination button.active {
+            background-color: #007bff;
+            color: #fff;
+            border-color: #007bff;
+            font-weight: bold;
+        }
+
+        .pagination button:disabled {
+            background-color: #f5f5f5;
+            color: #aaa;
+            cursor: not-allowed;
+        }
+
+
+    </style>
+</head>
+
+<body>
+<!--Navbar -->
+
+<nav class="navbar navbar-expand-lg navbar-dark cyan fixed-top">
+    <div class="container">
+        <a class="navbar-brand" href="index.html">
+            <img src="images/nav-logo.png" alt="nav-logo">
+        </a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent-4" aria-controls="navbarSupportedContent-4" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarSupportedContent-4">
+            <ul class="navbar-nav ml-auto">
+                <li class="nav-item ">
+                    <a class="nav-link" href="index.html">首页 <span class="sr-only">(current)</span></a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="typelist.html">文章分类</a>
+                </li>
+                <li class="nav-item ">
+                    <a class="nav-link" href="articlepublish.html">文章发表 </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="allarticle.html">文章列表</a>
+                </li>
+                <li class="nav-item active">
+                    <a class="nav-link" href="articlemanage.html">我的文章 </a>
+                </li>
+                <li class="nav-item" id="username-display" style="display: none;">
+                    <a class="nav-link" href="#" id="logged-username"></a>
+                </li>
+                <li class="nav-item" id="login-register">
+                    <a class="nav-link" href="login.html">登录 | 注册</a>
+                </li>
+                <li class="nav-item" id="logout" style="display: none;">
+                    <a class="nav-link" href="#" onclick="logout()">退出</a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<div class="wrapper">
+    <!-- 文章管理-->
+    <section class="gallery-page">
+        <div class="container">
+            <h2>文章管理</h2>
+            <!-- 文章管理表格 -->
+            <table class="article-table">
+                <thead>
+                <tr>
+                    <th>标题</th>
+                    <th>作者</th>
+                    <th>类别</th>
+                    <th>浏览量</th>
+                    <th>发布时间</th>
+                    <th>操作</th>
+                </tr>
+                </thead>
+                <tbody class="my-articles-page">
+                <!-- 动态加载文章列表 -->
+                </tbody>
+            </table>
+            <div class="pagination"></div>
+        </div>
+    </section>
+</div>
+
+    <footer id="usmanage">
+        <section class="footer-bottom">
+            <div class="container">
+                <div class="row">
+                    <div class="col-md-12">
+                        <ul>
+                            <li><a href="index.html">Home</a></li>
+                            <li class="hidden">/</li>
+                            <li><a href="typelist.html">About-us</a></li>
+                            <li class="hidden">/</li>
+                            <li><a href="mystories.html">My stories</a></li>
+                            <li class="hidden">/</li>
+                            <li><a href="destinations.html">Destinations</a></li>
+                            <li class="hidden">/</li>
+                            <li><a href="articlepublish.html">Gallery</a></li>
+                            <li class="hidden">/</li>
+                            <li><a href="articlemanage.html">Contact</a></li>
+                        </ul>
+                    </div>
+                    <div class="col-md-12">
+                        <p>(C) All Rights Reserved </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </footer>
+
+<!-- /.Footer -->
+<script src="js/auth.js"></script>
+<script>
+    $(document).ready(function () {
+        let currentUser = null; // 保存当前用户信息
+        // 获取当前登录用户信息
+        function getCurrentUser() {
+            const token = localStorage.getItem('token');
+            if (token) {
+                $.ajax({
+                    url: '/user/getUserInfo',
+                    method: 'GET',
+                    headers: { 'token': token },
+                    async: false, // 确保先获取到用户信息
+                    success: function (response) {
+                        if (response.code === 200 && response.data.loginUser) {
+                            currentUser = response.data.loginUser;
+                            console.log("currentUserInfo!!!!!:" + JSON.stringify(currentUser));
+                        }
+                    },
+                    error: function () {
+                        console.error("无法获取用户信息，请检查登录状态！");
+                    }
+                });
+            }
+        }
+        // 加载文章
+        function loadMyArticles(pageNum, pageSize) {
+            if (!currentUser) {
+                setTimeout(function () {
+                    window.location.href = "login.html";
+                }, 0);
+                return;
+            }
+            $.ajax({
+                url: '/portal/findArticlePage',
+                method: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify({ pageNum, pageSize, type: 0 }),
+                success: function (response) {
+                    if (response.code === 200) {
+                        const pageInfo = response.data.pageInfo;
+                        const articles = pageInfo.pageData;
+                        const totalPages = pageInfo.totalPage;
+                        // 清空表格内容
+                        $('.my-articles-page').empty();
+                        // 判断是否为管理员
+                        let filteredArticles;
+                        if (currentUser.username === "admin") {
+                            // 管理员加载全部文章
+                            filteredArticles = articles;
+                        } else {
+                            // 普通用户只加载自己发布的文章
+                            filteredArticles = articles.filter(article => article.publisher === currentUser.uid);
+                        }
+                        // 展示文章
+                        if (filteredArticles.length > 0) {
+                            filteredArticles.forEach(article => {
+                                $('.my-articles-page').append(`
+                                <tr data-hid="${article.hid}">
+                                    <td>${article.title}</td>
+                                    <td>${article.publisherName}</td>
+                                    <td>${article.typeName}</td>
+                                    <td>${article.pageViews}</td>
+                                    <td>${article.pastHours} 小时前</td>
+                                    <td>
+                                        <button class="edit-btn" data-hid="${article.hid}">修改</button>
+                                        <button class="delete-btn" data-hid="${article.hid}">删除</button>
+                                    </td>
+                                </tr>
+                            `);
+                            });
+                        } else {
+                            $('.my-articles-page').html('<tr><td colspan="5" style="text-align: center;">暂无文章。</td></tr>');
+                        }
+
+                        // 生成分页
+                        generatePagination(pageInfo.pageNum, totalPages);
+                        bindArticleButtons();
+                    } else {
+                        alert("加载文章失败：" + response.message);
+                    }
+                },
+                error: function () {
+                    alert("请求失败，请稍后重试。");
+                }
+            });
+        }
+        // 生成分页功能
+        function generatePagination(currentPage, totalPages) {
+            $('.pagination').empty();
+            if (currentPage > 1) {
+                $('.pagination').append(`<button class="page-btn" data-page="${currentPage - 1}">上一页</button>`);
+            }
+            for (let i = 1; i <= totalPages; i++) {
+                $('.pagination').append(`<button class="page-btn ${i === currentPage ? 'active' : ''}" data-page="${i}">${i}</button>`);
+            }
+            if (currentPage < totalPages) {
+                $('.pagination').append(`<button class="page-btn" data-page="${currentPage + 1}">下一页</button>`);
+            }
+            $('.page-btn').click(function () {
+                const page = $(this).data('page');
+                loadMyArticles(page, 10); // 默认每页显示 10 条
+            });
+        }
+
+        // 绑定修改和删除按钮事件
+        function bindArticleButtons() {
+            $('.edit-btn').click(function () {
+                const hid = $(this).data('hid');
+                // 跳转到编辑页面，并传递文章ID
+                window.location.href = `article-edit.html?hid=${hid}`;
+            });
+
+            $('.delete-btn').click(function () {
+                const hid = $(this).data('hid');
+                deleteArticle(hid);
+            });
+        }
+
+        // 删除文章
+        function deleteArticle(hid) {
+            if (confirm("确定要删除这篇文章吗？")) {
+                $.ajax({
+                    url: `/headline/removeByHid?hid=${hid}`,
+                    method: 'POST',
+                    success: function (response) {
+                        if (response.code === 200) {
+                            alert("文章删除成功！");
+                            loadMyArticles(1, 10); // 重新加载第一页
+                        } else {
+                            alert("删除失败：" + response.message);
+                        }
+                    },
+                    error: function () {
+                        alert("请求失败，请稍后重试。");
+                    }
+                });
+            }
+        }
+
+        // 初始化
+        getCurrentUser(); // 获取用户信息
+        if (currentUser) {
+            loadMyArticles(1, 10); // 加载第一页的文章
+        } else {
+            alert("请先登录！");
+            window.location.href = 'login.html';
+        }
+    });
+
+
+</script>
+</body>
+</html>

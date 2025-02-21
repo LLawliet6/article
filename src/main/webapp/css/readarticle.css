@@ -1,0 +1,176 @@
+/* 设置内容区域在导航栏和页脚之间显示 */
+#allarticle {
+    position: relative;
+    top: 80px; /* 确保内容在导航栏下方 */
+    bottom: 80px; /* 确保内容在页脚上方 */
+    padding: 20px;
+    min-height: calc(100vh - 160px); /* 确保内容占据足够高度，避免被导航栏和页脚覆盖 */
+    box-sizing: border-box;
+}
+
+#article-detail {
+    padding: 20px;
+    max-width: 800px;
+    margin: 0 auto;
+    background-color: #f9f9f9;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* 添加阴影效果 */
+    border-radius: 10px;
+}
+
+#back-btn {
+    margin-top: 20px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+#fixed-footer {
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+    background-color: #333;
+    color: white;
+    padding: 10px 0;
+    text-align: center;
+    z-index: 10;
+}
+
+/* 确保页面主体不会被页脚遮挡 */
+body {
+    padding-bottom: 80px; /* 为了防止内容被页脚遮挡，预留足够的空间 */
+}
+
+#article-detail {
+    background-color: #f9f9f9; /* 背景颜色 */
+    padding: 20px; /* 内边距 */
+    border-radius: 10px; /* 圆角 */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* 添加阴影效果 */
+    margin: 20px 0; /* 外边距 */
+    font-family: 'Arial', sans-serif; /* 设置全局字体 */
+    color: #333; /* 字体颜色 */
+}
+
+#article-title {
+    font-size: 28px; /* 标题字体大小 */
+    font-weight: bold; /* 加粗 */
+    margin-bottom: 10px; /* 与下面的内容分开 */
+    color: #333; /* 标题颜色 */
+}
+
+#article-type, #article-author, #article-pastHours, #article-views {
+    font-size: 14px; /* 元信息字体大小 */
+    color: #666; /* 元信息颜色 */
+    margin-bottom: 5px; /* 行间距 */
+}
+
+#article-content {
+    margin-top: 20px; /* 内容与元信息的间距 */
+    line-height: 1.6; /* 行间距，提升阅读体验 */
+    font-size: 16px; /* 内容字体大小 */
+    color: #444; /* 内容文字颜色 */
+}
+
+/* 返回列表按钮的样式 */
+#back-btn {
+    display: inline-block;
+    padding: 10px 20px;
+    background-color: #007bff; /* 按钮背景颜色 */
+    color: #fff; /* 按钮文字颜色 */
+    border: none;
+    border-radius: 5px; /* 按钮圆角 */
+    margin-top: 20px;
+    cursor: pointer;
+    transition: background-color 0.3s ease; /* 添加过渡效果 */
+}
+
+#back-btn:hover {
+    background-color: #0056b3; /* 悬停时按钮颜色 */
+}
+/* 将元信息排成一行 */
+#article-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px; /* 元素之间的间距 */
+    font-size: 14px; /* 文字大小 */
+    color: #777; /* 字体颜色 */
+    margin-bottom: 20px; /* 与文章内容的距离 */
+}
+
+#article-meta p {
+    margin: 0;
+}
+/* 全局按钮样式 */
+button {
+    font-size: 16px;
+    padding: 10px 15px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+/* 阅读全文按钮 */
+/*.read-more-btn {*/
+/*    width: 100px;*/
+/*    background-color: #13212b; !* 按钮背景色 *!*/
+/*    color: #efd740; !* 文字颜色 *!*/
+/*}*/
+
+/*.read-more-btn:hover {*/
+/*    background-color: #218838; !* 悬停时的颜色变化 *!*/
+/*}*/
+
+/* 返回列表按钮的样式 */
+#back-btn {
+    display: inline-block;
+    padding: 10px 20px;
+    background-color: #13202c;
+    color: #efd740;
+    border: none;
+    border-radius: 5px;
+    margin-top: 20px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+#back-btn:hover {
+    background-color: #0056b3;
+}
+.pagination {
+    display: flex;
+    justify-content: center; /* 居中对齐 */
+    margin-top: 20px;
+}
+
+.pagination button {
+    background-color: #f1f1f1; /* 默认背景颜色 */
+    border: 1px solid #ddd; /* 边框 */
+    padding: 8px 16px;
+    margin: 0 5px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.pagination button:hover {
+    background-color: #007bff;
+    color: #fff;
+}
+
+.pagination .active {
+    background-color: #007bff; /* 当前页的背景颜色 */
+    color: white;
+    pointer-events: none; /* 禁用点击 */
+}
+#article-detail {
+    max-width: 800px; /* 设置最大宽度 */
+    margin: 0 auto; /* 自动居中 */
+    padding: 20px;
+    background-color: #f9f9f9;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    color: #333;
+}

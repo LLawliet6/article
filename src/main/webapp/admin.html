@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>管理员后台管理</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <style>
+        /* 基本样式设置 */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            color: #333;
+            background-color: #f5f5f5;
+            display: flex;
+            height: 100vh;
+        }
+
+        /* 整体布局 */
+        .admin-container {
+            display: flex;
+            width: 100%;
+            height: 100%;
+        }
+
+        /* 左侧导航栏样式 */
+        .sidebar {
+            width: 250px;
+            background-color: #2c3e50;
+            color: white;
+            padding: 20px;
+            box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .sidebar h2 {
+            margin-bottom: 20px;
+            font-size: 24px;
+            text-align: center;
+        }
+
+        .sidebar ul {
+            list-style: none;
+        }
+
+        .sidebar li {
+            padding: 10px 15px;
+            margin: 10px 0;
+            background-color: #34495e;
+            border-radius: 5px;
+            cursor: pointer;
+            text-align: center;
+        }
+
+        .sidebar li:hover {
+            background-color: #1abc9c;
+        }
+
+        /* 主内容区域样式 */
+        .main-content {
+            flex: 1;
+            padding: 20px;
+            background-color: white;
+            overflow-y: auto;
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        header h1 {
+            font-size: 28px;
+        }
+
+        header button {
+            background-color: #e74c3c;
+            color: white;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        header button:hover {
+            background-color: #c0392b;
+        }
+
+        #content {
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            background-color: #f9f9f9;
+            min-height: 500px;
+        }
+
+    </style>
+</head>
+
+<body>
+<div class="admin-container">
+    <!-- 左侧导航栏 -->
+    <nav class="sidebar">
+        <h2>后台管理</h2>
+        <ul>
+            <li id="manage-articles">文章管理</li>
+
+            <li id="manage-users">用户管理</li>
+            <li id="manage-comments">评论管理</li>
+        </ul>
+    </nav>
+
+    <!-- 主内容区域 -->
+    <main class="main-content">
+        <header>
+            <h1>欢迎进入后台管理系统</h1>
+            <button id="logout">退出登录</button>
+        </header>
+        <section id="content">
+            <p>请选择左侧菜单进行操作。</p>
+        </section>
+    </main>
+</div>
+
+<script>
+    $(document).ready(function () {
+        // 切换不同的管理界面内容
+        $('#manage-articles').click(function () {
+            $('#content').html('<h2>文章管理</h2><p>在这里管理文章。</p>');
+        });
+
+        $('#manage-users').click(function () {
+            $('#content').html('<h2>用户管理</h2><p>在这里管理用户。</p>');
+        });
+
+        $('#manage-comments').click(function () {
+            $('#content').html('<h2>评论管理</h2><p>在这里管理评论。</p>');
+        });
+
+        // 退出登录
+        $('#logout').click(function () {
+            localStorage.removeItem('token');
+            alert('已退出登录');
+            window.location.href = 'adminlogin.html';
+        });
+        // 加载所有文章
+        function loadArticles() {
+            $.ajax({
+                url: '/admin/getAllArticles',  // 后台接口地址，获取所有文章
+                method: 'GET',
+                success: function (response) {
+                    if (response.code === 200) {
+                        const articles = response.data;
+                        let html = '<table><thead><tr><th>标题</th><th>作者</th><th>发布时间</th><th>操作</th></tr></thead><tbody>';
+
+                        articles.forEach(function (article) {
+                            html += `
+                            <tr>
+                                <td>${article.title}</td>
+                                <td>${article.author}</td>
+                                <td>${new Date(article.createTime).toLocaleString()}</td>
+                                <td>
+                                    <button class="edit-btn" data-id="${article.id}">修改</button>
+                                    <button class="delete-btn" data-id="${article.id}">删除</button>
+                                </td>
+                            </tr>
+                        `;
+                        });
+
+                        html += '</tbody></table>';
+                        $('#article-list').html(html);
+                    } else {
+                        $('#article-list').html('<p>没有找到文章。</p>');
+                    }
+                },
+                error: function () {
+                    $('#article-list').html('<p>加载文章失败，请稍后再试。</p>');
+                }
+            });
+        }
+
+        // 删除文章
+        $(document).on('click', '.delete-btn', function () {
+            const articleId = $(this).data('id');
+            if (confirm('确定要删除这篇文章吗？')) {
+                $.ajax({
+                    url: `/admin/deleteArticle/${articleId}`,  // 删除文章的接口
+                    method: 'DELETE',
+                    success: function (response) {
+                        if (response.code === 200) {
+                            alert('删除成功');
+                            loadArticles();  // 删除后重新加载文章列表
+                        } else {
+                            alert('删除失败: ' + response.message);
+                        }
+                    },
+                    error: function () {
+                        alert('删除失败，请稍后重试');
+                    }
+                });
+            }
+        });
+
+        // 修改文章
+        $(document).on('click', '.edit-btn', function () {
+            const articleId = $(this).data('id');
+            window.location.href = `/admin/editArticle/${articleId}`;  // 跳转到修改文章页面
+        });
+    });
+</script>
+</body>
+</html>

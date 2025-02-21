@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>管理员登录注册</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <style>
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-image: url('./images/aminlogin.jpg'); /* 设置背景图片 */
+            background-size: cover; /* 确保图片覆盖整个页面 */
+            background-position: center; /* 背景居中 */
+            background-color: #f0f2f5;
+            font-family: Arial, sans-serif;
+        }
+
+        .login-container {
+            width: 300px;
+            margin: 100px auto;
+            padding: 20px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        h2 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 20px;
+        }
+
+        label {
+            margin-bottom: 5px;
+            display: block;
+            color: #555;
+        }
+
+        input[type="text"], input[type="password"] {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 15px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+
+        input[type="text"]:focus, input[type="password"]:focus {
+            border-color: #007bff;
+            outline: none;
+            box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
+        }
+
+        button {
+            width: 100%;
+            padding: 10px;
+            background-color: #007bff;
+            border: none;
+            border-radius: 4px;
+            color: white;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+
+        #error-message {
+            color: red;
+            display: none;
+            text-align: center;
+            margin-top: 10px;
+        }
+    </style>
+
+</head>
+<body>
+
+<div class="login-container">
+    <h2>管理员登录</h2>
+    <label for="login-username">用户名：</label>
+    <input type="text" id="login-username" placeholder="请输入用户名"><br>
+    <label for="login-password">密码：</label>
+    <input type="password" id="login-password" placeholder="请输入密码"><br>
+    <button id="login-btn">登录</button>
+    <p id="error-message"></p>
+</div>
+
+
+<!--<hr>-->
+<!--<div>-->
+<!--    <h2>管理员注册</h2>-->
+<!--    <label for="register-username">用户名：</label>-->
+<!--    <input type="text" id="register-username"><br>-->
+<!--    <label for="register-password">密码：</label>-->
+<!--    <input type="password" id="register-password"><br>-->
+<!--    <button id="register-btn">注册</button>-->
+<!--</div>-->
+
+<script>
+    $(document).ready(function () {
+        // 注册管理员
+        $('#register-btn').click(function () {
+            const username = $('#register-username').val();
+            const password = $('#register-password').val(); // 修改这里，前端字段名为 password
+            const url = '/admin/register'; // 管理员注册的 URL
+            const adminData = {username, password}; // 发送的 JSON 数据字段名为 password
+
+            $.ajax({
+                url: url,
+                type: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify(adminData), // 发送 JSON 数据
+                success: function (response) {
+                    if (response.code === 200) {
+                        alert('管理员注册成功！');
+                    } else {
+                        alert('注册失败：' + response.message);
+                    }
+                },
+                error: function () {
+                    alert('注册请求失败');
+                }
+            });
+        });
+
+
+        // 登录管理员
+        $('#login-btn').click(function () {
+            const username = $('#login-username').val();
+            const password = $('#login-password').val();
+
+            if (!username || !password) {
+                alert('请输入完整的用户名和密码！');
+                return;
+            }
+
+            const adminLoginData = {
+                username: username,
+                password: password
+            };
+
+            $.ajax({
+                url: '/admin/login', // 确保后台有专门的管理员登录接口
+                type: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify(adminLoginData),
+                success: function (response) {
+                    if (response.code === 200) {
+                        alert('登录成功！');
+                        localStorage.setItem('adminToken', response.data.token); // 存储管理员 token
+                        localStorage.setItem('adminUsername', username); // 存储管理员用户名
+                        window.location.href = 'admin.html'; // 跳转到管理员后台页面
+                    } else {
+                        $('#error-message').text('用户名或密码错误').show();
+                    }
+                },
+                error: function () {
+                    alert('登录请求失败');
+                }
+            });
+        });
+
+        // 当密码框获得焦点时清空输入并隐藏错误信息
+        $('#login-password').focus(function () {
+            $('#error-message').hide();
+        });
+    });
+</script>
+</body>
+</html>

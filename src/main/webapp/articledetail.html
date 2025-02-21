@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <title>Clickaholic</title>
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/4.0.0/css/bootstrap.min.css"
+          integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+    <link rel="stylesheet" href="css/main.css">
+    <link rel="stylesheet" href="css/readarticle.css">
+    <script src="js/auth.js"></script>
+    <script src="./js/jquery-3.6.0.min.js"></script>
+    <style>
+        /*评论*/
+        /* 增加选择器的特异性 */
+        /* 确保评论区域不会受到全局样式的影响 */
+        /* 父级评论和子级评论的样式 */
+        /* 增加选择器的优先级 */
+        #comments-section #comment-list, #comments-section #comment-list ul, #comments-section #comment-list li {
+            width: 100%;
+            margin: 0;
+            padding: 0;
+            list-style-type: none; /* 去除默认的列表样式 */
+        }
+
+        #comments-section #comment-list ul {
+            padding-left: 0; /* 确保没有默认的缩进 */
+        }
+
+        #comments-section #comment-list li {
+            display: block;
+            margin-bottom: 20px; /* 每条评论之间的间距 */
+        }
+
+        /* 增强评论框的样式 */
+        #comments-section .comment-item {
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            background-color: #f9f9f9;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        /* 增加子评论的缩进 */
+        #comments-section .comment-item ul {
+            margin-top: 10px;
+            margin-left: 20px; /* 子评论的缩进 */
+        }
+
+        #comments-section .comment-item ul .comment-item {
+            background-color: #f0f0f0;
+            border: 1px solid #ccc;
+            margin-bottom: 10px;
+        }
+
+        /* 增强按钮样式 */
+        #comments-section .reply-btn {
+            margin-top: 10px;
+            background-color: #f0f0f0;
+            border: none;
+            padding: 5px 10px;
+            cursor: pointer;
+            border-radius: 4px;
+        }
+
+        #comments-section .reply-btn:hover {
+            background-color: #ddd;
+        }
+
+
+        /*图片*/
+        #article-image {
+            display: none;
+            width: 100%;
+            height: auto;
+            max-width: 600px; /* 限制最大宽度为 800px */
+            margin: 0 auto; /* 居中显示 */
+        }
+
+    </style>
+</head>
+
+<body>
+<!--Navbar -->
+<nav class="navbar navbar-expand-lg navbar-dark cyan fixed-top">
+    <div class="container">
+        <a class="navbar-brand" href="index.html">
+            <img src="images/nav-logo.png" alt="nav-logo">
+        </a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent-4"
+                aria-controls="navbarSupportedContent-4" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarSupportedContent-4">
+            <ul class="navbar-nav ml-auto">
+                <li class="nav-item">
+                    <a class="nav-link" href="index.html">首页 </a>
+                </li>
+                <li class="nav-item ">
+                    <a class="nav-link" href="typelist.html">文章分类</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="articlepublish.html">文章发表 </a>
+                </li>
+                <li class="nav-item active">
+                    <a class="nav-link" href="allarticle.html">文章列表</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="articlemanage.html">我的文章</a>
+                </li>
+                <li class="nav-item" id="username-display" style="display: none;">
+                    <a class="nav-link" href="#" id="logged-username"></a>
+                </li>
+                <li class="nav-item" id="login-register">
+                    <a class="nav-link" href="login.html">登录 | 注册</a>
+                </li>
+                <li class="nav-item" id="logout" style="display: none;">
+                    <a class="nav-link" href="#" onclick="logout()">退出</a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
+<section class="gallery-page">
+    <div class="container" style="display: flex; align-items: flex-start; gap: 20px;">
+        <!-- 附件列表 -->
+        <div id="attachment-list" style="width: 20%; border-right: 1px solid #ddd; padding-right: 20px;">
+            <h3>附件列表</h3>
+            <!-- 动态加载附件 -->
+        </div>
+        <div id="allarticle" style="margin-top: -50px;width: 1000px">
+            <!-- 文章详情的显示区域 -->
+            <div id="article-detail" style="display: none;">
+                <h2 id="article-title"></h2>
+                <div id="article-meta">
+                    <p id="article-type"></p>
+                    <p id="article-author"></p>
+                    <p id="article-pastHours"></p>
+                    <p id="article-views"></p>
+                </div>
+                <!-- 设置图片宽度为100%并保持纵横比 -->
+                <img id="article-image" style="display: none; width: 100%; height: auto;"/>
+                <div id="article-content"></div>
+
+                <button id="back-btn">返回列表</button>
+                <!-- 评论区域 -->
+                <div id="comments-section" style="margin-top: 40px;">
+                    <h3>评论</h3>
+
+                    <!-- 评论表单 -->
+                    <div id="comment-form" style="margin-bottom: 30px;">
+                <textarea id="comment-content" placeholder="发表评论..."
+                          style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 4px; resize: vertical; height: 80px;"></textarea>
+                        <button id="submit-comment-btn"
+                                style="margin-top: 10px; padding: 10px 20px; background-color: #4CAF50; color: white; border: none; border-radius: 4px; cursor: pointer;">
+                            提交评论
+                        </button>
+                    </div>
+
+                    <!-- 评论列表 -->
+                    <div id="comment-list" style="margin-top: 20px;">
+                        <!-- 动态加载评论 -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+
+<!-- Footer -->
+<footer>
+    <section class="footer-bottom">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-12">
+                    <ul>
+                        <li><a href="index.html">Home</a></li>
+                        <li class="hidden">/</li>
+                        <li><a href="typelist.html">About-us</a></li>
+                        <li class="hidden">/</li>
+                        <li><a href="mystories.html">My stories</a></li>
+                        <li class="hidden">/</li>
+                        <li><a href="destinations.html">Destinations</a></li>
+                        <li class="hidden">/</li>
+                        <li><a href="articlepublish.html">Gallery</a></li>
+                        <li class="hidden">/</li>
+                        <li><a href="articlemanage.html">Contact</a></li>
+                    </ul>
+                </div>
+                <div class="col-md-12">
+                    <p>(C) All Rights Reserved </p>
+                </div>
+            </div>
+        </div>
+    </section>
+</footer>
+<script>
+    $(document).ready(function () {
+        let currentArticleId = null;
+        // 获取当前用户信息
+        function getCurrentUser() {
+            const token = localStorage.getItem('token');
+            let currentUser = null;
+            if (token) {
+                $.ajax({
+                    url: '/user/getUserInfo',
+                    method: 'GET',
+                    headers: {'token': token},
+                    async: false,
+                    success: function (response) {
+                        if (response.code === 200) {
+                            currentUser = response.data.loginUser;
+                        }
+                    },
+                    error: function () {
+                        console.error("获取用户信息失败");
+                    }
+                });
+            }
+            return currentUser;
+        }
+
+        // 获取 URL 参数值
+        function getQueryParam(param) {
+            const urlParams = new URLSearchParams(window.location.search);
+            return urlParams.get(param);
+        }
+        // 从 URL 获取文章 ID
+        const articleHid = getQueryParam('hid');
+        if (articleHid) {
+            loadArticleDetail(articleHid);
+        } else {
+            alert('文章 ID 缺失');
+            window.location.href = 'allarticle.html'; // 如果缺少参数，返回文章列表页
+        }
+
+        // 加载文章详情
+        function loadArticleDetail(hid) {
+            $.ajax({
+                url: '/portal/showHeadlineDetail',
+                method: 'GET',
+                data: {hid: hid},
+                success: function (response) {
+                    if (response.code === 200) {
+                        const articleData = response.data.headline;
+                        $('#article-title').text(articleData.title);
+                        $('#article-type').text('分类: ' + articleData.typeName);
+                        $('#article-author').text('作者: ' + (articleData.publisherName || '匿名'));
+                        $('#article-pastHours').text('发布时间: ' + articleData.pastHours + ' 小时前');
+                        $('#article-views').text('浏览量: ' + articleData.pageViews);
+                        $('#article-content').html(articleData.article);
+                        // 设置当前文章ID
+                        currentArticleId = hid;
+                        // 加载文章图片
+                        if (articleData.imageUrl) {
+                            $('#article-image').attr('src', articleData.imageUrl).show();
+                        } else {
+                            $('#article-image').hide();
+                        }
+                        $('#article-detail').show();
+
+                        // 加载评论
+                        loadComments(hid);
+                    } else {
+                        alert('加载文章详情失败: ' + response.message);
+                    }
+                },
+                error: function () {
+                    alert('请求失败，请稍后重试。');
+                }
+            });
+        }
+
+        // 返回列表按钮点击事件
+        $('#back-btn').click(function () {
+            window.location.href = 'allarticle.html';
+        });
+
+        // 递归渲染评论
+        function renderComments(comments) {
+            // 按时间升序排序（老到新）
+            comments.sort(function (a, b) {
+                return new Date(a.createTime) - new Date(b.createTime);
+            });
+
+            let html = '<ul>';
+            comments.forEach(function (comment) {
+                let replyInfo = '';
+                if (comment.replyUsername) {
+                    replyInfo = `回复 <strong>${comment.replyUsername}</strong>: `;
+                }
+
+                // 父评论，开启 <li>
+                html += `
+        <li>
+            <div class="comment-item">
+                <p><strong>${comment.username}</strong></p>
+                <p>${replyInfo}${comment.content}</p>
+                <small>${new Date(comment.createTime).toLocaleString()}</small>
+                <button class="reply-btn" data-cid="${comment.cid}">回复</button>
+        `;
+
+                // 递归渲染子评论
+                if (comment.children && comment.children.length > 0) {
+                    html += '<ul>';
+                    html += renderComments(comment.children); // 渲染子评论
+                    html += '</ul>';
+                }
+                html += '</div></li>';
+            });
+            html += '</ul>';
+            console.log(html)
+            return html;
+        }
+
+        // 加载文章评论
+        function loadComments(articleId) {
+            $.ajax({
+                url: `/comment/findCommentsByArticleId?articleId=${articleId}`,
+                method: 'GET',
+                success: function (response) {
+                    const $commentList = $('#comment-list');
+                    $commentList.empty(); // 清空旧评论
+
+                    if (response.code === 200 && response.data && response.data.length > 0) {
+                        const comments = response.data;
+                        const commentsHtml = renderComments(comments);
+                        $commentList.append(commentsHtml);
+                    } else {
+                        $commentList.html('<p>没有评论。</p>');
+                    }
+                },
+                error: function () {
+                    $('#comment-list').html('<p>评论加载失败，请稍后重试。</p>');
+                }
+            });
+        }
+
+
+        // 提交评论按钮点击事件
+        $('#submit-comment-btn').click(function () {
+            submitComment(null); // 提交顶级评论
+        });
+
+// 提交评论方法
+        function submitComment(pid = null) {
+            const token = localStorage.getItem('token');
+            const currentUser = getCurrentUser();
+            if (!token || !currentUser) {
+                alert("请先登录后再发表评论。");
+                return;
+            }
+            const commentContent = $('#comment-content').val();
+            if (!commentContent.trim()) {
+                alert("评论内容不能为空！");
+                return;
+            }
+            const commentData = {
+                articleId: currentArticleId,
+                userId: currentUser.uid,
+                content: commentContent,
+                pid: pid // 父评论的ID，顶级评论时为null
+            };
+
+            $.ajax({
+                url: '/comment/saveComment',
+                method: 'POST',
+                data: commentData,
+                success: function (response) {
+                    if (response.code === 200) {
+                        alert("评论成功！");
+                        $('#comment-content').val('');
+                        loadComments(currentArticleId); // 重新加载评论
+                    } else {
+                        alert("评论失败：" + response.message);
+                    }
+                },
+                error: function () {
+                    alert("请求失败，请稍后重试。");
+                }
+            });
+        }
+
+        // 回复按钮点击事件
+        $(document).on('click', '.reply-btn', function () {
+            const pid = $(this).data('cid'); // 获取被回复评论的ID
+            const replyContent = prompt("请输入回复内容:");
+            if (replyContent) {
+                $('#comment-content').val(replyContent); // 把回复内容放入输入框
+                submitComment(pid); // 提交回复，带上父评论ID
+            }
+        });
+
+    });
+</script>
+<script src="js/getattachments.js"></script>
+</body>
+</html>
