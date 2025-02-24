@@ -1,0 +1,102 @@
+/* 设置背景图片和透明度 */
+.with-background {
+    position: relative; /* 确保子元素正常布局 */
+    background-image: url('/images/list.jpg'); /* 替换为你的图片路径 */
+    background-size: cover; /* 图片覆盖整个背景 */
+    background-position: center; /* 居中显示背景图片 */
+    padding: 20px; /* 给内容留出内边距 */
+    border-radius: 5px; /* 可选：增加圆角 */
+}
+
+/* 添加一个半透明遮罩层 */
+.with-background::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(255, 255, 255, 0.4); /* 半透明白色遮罩层，0.7 表示透明度 */
+    z-index: 1; /* 遮罩层优先级低于内容 */
+    border-radius: 5px; /* 与容器圆角一致 */
+}
+
+/* 确保文字内容位于遮罩层上方 */
+.with-background h2,
+.with-background .categories-nav,
+.with-background .article-categories {
+    position: relative;
+    z-index: 2; /* 使文字位于遮罩层之上 */
+}
+
+
+
+/* 全局样式 */
+body {
+    font-family: Arial, sans-serif;
+    line-height: 1.6;
+}
+
+/* 容器框架 */
+.categorie-frame {
+    padding: 20px;
+    background-color: #f9f9f9;
+    border-radius: 10px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* 标题样式 */
+.categories-title {
+    text-align: center;
+    font-size: 24px;
+    font-weight: bold;
+    margin-bottom: 20px;
+    color: #0b0a0a;
+}
+
+/* 每个分类区域 */
+.category-item {
+    margin-bottom: 30px;
+    padding-bottom: 15px;
+    border-bottom: 1px solid #ddd;
+}
+
+/* 确保标题独占一行 */
+#category-container .category-item h4 {
+    display: block; /* 强制设置为块级元素 */
+    font-size: 20px;
+    margin-bottom: 10px;
+    font-weight: bold;
+    color: #007bff;
+    line-height: 1.5;
+}
+
+/* 分类区域的边距和分隔线 */
+#category-container .category-item {
+    margin-bottom: 30px;
+    padding-bottom: 15px;
+    border-bottom: 1px solid #ccc;
+}
+
+/* 文章列表样式 */
+#category-container .category-item ul {
+    list-style: none;
+    padding: 0;
+}
+
+#category-container .category-item ul li {
+    font-size: 18px;
+    margin-left: 20px;
+    margin-bottom: 8px;
+}
+
+#category-container .category-item ul li a {
+    text-decoration: none;
+    color: #020202;
+    transition: color 0.3s ease;
+}
+
+#category-container .category-item ul li a:hover {
+    color: #b5a54a;
+}
+

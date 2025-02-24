@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="Cache-Control" content="no-store"/>
+    <title>Clickaholic</title>
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/4.0.0/css/bootstrap.min.css"
+          integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+    <link rel="stylesheet" href="css/main.css">
+    <script src="./js/jquery-3.6.0.min.js"></script>
+    <link rel="stylesheet" href="css/readarticle.css">
+    <link rel="stylesheet" href="css/article-list.css">
+</head>
+
+<body>
+<!-- Navbar -->
+<nav class="navbar navbar-expand-lg navbar-dark cyan fixed-top">
+    <div class="container">
+        <a class="navbar-brand" href="index.html">
+            <img src="images/nav-logo.png" alt="nav-logo" loading="lazy">
+        </a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent-4"
+                aria-controls="navbarSupportedContent-4" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarSupportedContent-4">
+            <ul class="navbar-nav ml-auto">
+                <li class="nav-item">
+                    <a class="nav-link" href="index.html">首页 <span class="sr-only">(current)</span></a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="typelist.html">文章分类</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="articlepublish.html">文章发表 </a>
+                </li>
+                <li class="nav-item active" >
+                    <a class="nav-link" href="allarticle.html">文章列表</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="articlemanage.html">我的文章</a>
+                </li>
+                <li class="nav-item" id="username-display" style="display: none;">
+                    <a class="nav-link" href="#" id="logged-username"></a>
+                </li>
+                <li class="nav-item" id="login-register">
+                    <a class="nav-link" href="login.html">登录 | 注册</a>
+                </li>
+                <li class="nav-item" id="logout" style="display: none;">
+                    <a class="nav-link" href="#" onclick="logout()">退出</a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<div id="allarticle" style="display: flex;">
+    <!-- 左侧分类栏 -->
+    <div id="category-sidebar" style="width: 200px;height: 320px; padding: 20px; background-color: #f4f4f4; border-right: 1px solid #ddd;">
+        <h3>文章分类</h3>
+        <div id="category-list" style="margin-top: 20px;">
+            <!-- 分类会动态加载到这里 -->
+        </div>
+    </div>
+    <!-- 右侧文章内容区域 -->
+    <div style="flex: 1; padding: 20px;">
+        <h1 style="text-align: center">文章列表</h1>
+        <!-- 搜索框 -->
+        <div class="seachkuang" id="search-container" style="text-align: right; margin: 10px; margin-right: 80px;">
+            <input type="text" id="search-input" placeholder="搜索文章..." style="padding: 5px; width: 200px; border-radius: 20px;">
+            <button id="search-btn" style="padding: 5px 10px;">搜索</button>
+        </div>
+
+        <!-- 文章列表的显示区域 -->
+        <section class="article-page">
+            <!-- 文章会动态加载到这里 -->
+        </section>
+
+        <!-- 分页器 -->
+        <div class="pagination" style="padding-bottom: 50px; text-align: center;"></div>
+    </div>
+</div>
+
+
+<!-- Footer -->
+<footer >
+    <section class="footer-bottom">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-12">
+                    <ul>
+                        <li><a href="index.html">Home</a></li>
+                        <li class="hidden">/</li>
+                        <li><a href="typelist.html">About-us</a></li>
+                        <li class="hidden">/</li>
+                        <li><a href="mystories.html">My stories</a></li>
+                        <li class="hidden">/</li>
+                        <li><a href="destinations.html">Destinations</a></li>
+                        <li class="hidden">/</li>
+                        <li><a href="articlepublish.html">Gallery</a></li>
+                        <li class="hidden">/</li>
+                        <li><a href="articlemanage.html">Contact</a></li>
+                    </ul>
+                </div>
+                <div class="col-md-12">
+                    <p>(C) All Rights Reserved </p>
+                </div>
+            </div>
+        </div>
+    </section>
+</footer>
+
+<script src="js/auth.js"></script>
+<script>
+    // const editQuill = new Quill('#edit-content-editor', {
+    //     theme: 'snow',
+    //     placeholder: '编辑文章内容...',
+    //     modules: {
+    //         toolbar: [
+    //             ['bold', 'italic', 'underline'], // 样式
+    //             [{ 'list': 'ordered' }, { 'list': 'bullet' }], // 列表
+    //             ['link', 'image'], // 链接和图片
+    //             [{ 'color': [] }, { 'background': [] }], // 颜色
+    //         ]
+    //     }
+    // });
+
+
+    $(document).ready(function () {
+        let currentPage = 1; // 当前分页页码
+        const pageSize = 4; // 每页显示的文章数
+        let selectedCategory = 0; // 默认选择所有类别（type为0表示所有分类）
+        let currentKeywords = ""; // 当前搜索关键词
+
+        // 获取所有分类并显示在左侧
+        function loadCategories() {
+            $.ajax({
+                url: '/portal/findAllTypes',
+                method: 'GET',
+                success: function (response) {
+                    if (response.code === 200) {
+                        const categories = response.data; // 获取类别数组
+                        const $categoryList = $('#category-list');
+                        $categoryList.empty(); // 清空列表
+
+                        // 添加“所有文章”选项
+                        $categoryList.append(`
+                        <div class="category-item" data-tid="0" style="padding: 5px; cursor: pointer; background-color: #e2e2e2; border-radius: 5px; text-align: center;">
+                            所有文章
+                        </div>
+                    `);
+
+                        // 动态加载分类
+                        categories.forEach(category => {
+                            $categoryList.append(`
+                            <div class="category-item" data-tid="${category.tid}" style="padding: 5px; cursor: pointer; background-color: #e2e2e2; border-radius: 5px; text-align: center;">
+                                ${category.tname}
+                            </div>
+                        `);
+                        });
+
+                        // 默认加载所有文章
+                        loadArticlelist(currentPage, pageSize, currentKeywords, selectedCategory);
+                    } else {
+                        alert("加载分类失败：" + response.message);
+                    }
+                },
+                error: function () {
+                    alert("请求分类数据失败，请稍后重试。");
+                }
+            });
+        }
+
+        // 绑定分类点击事件，点击分类后加载该分类的文章
+        function bindCategoryClick() {
+            $('#category-list').on('click', '.category-item', function () {
+                selectedCategory = $(this).data('tid'); // 获取分类ID
+                $('.category-item').css('background-color', '#e2e2e2'); // 重置所有分类背景色
+                $(this).css('background-color', '#ccc'); // 设置当前选中的分类背景色
+
+                // 如果点击的是“所有文章”，则清空搜索关键词
+                if (selectedCategory === 0) {
+                    currentKeywords = ""; // 清空搜索关键词
+                    $('#search-input').val(""); // 清空搜索框
+                }
+
+                loadArticlelist(1, pageSize, currentKeywords, selectedCategory); // 默认从第一页开始加载该分类文章
+            });
+        }
+
+        // 加载文章列表
+        function loadArticlelist(pageNum, pageSize, keyWords, selectedCategory) {
+            $.ajax({
+                url: '/portal/findArticlePage',
+                method: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify({ pageNum, pageSize, type: selectedCategory, keyWords }),
+                dataType: 'json',
+                success: function (response) {
+                    if (response.code === 200) {
+                        const articles = response.data.pageInfo.pageData;
+                        $('.article-page').empty(); // 清空当前文章列表
+                        // 动态生成文章列表
+                        articles.forEach(function (article) {
+                            const typeImage = article.imageUrl || '/images/default.jpg'; // 如果没有 imageUrl，则使用默认图片
+                            $('.article-page').append(`
+                        <div class="article-item" data-hid="${article.hid}">
+                            <img src="${typeImage}" alt="文章图片" />
+                            <div class="content">
+                                <h4><a href="/allarticle.html?hid=${article.hid}">${article.title}</a></h4>
+                                <p>类别：${article.typeName}</p>
+                                <p>浏览量: ${article.pageViews} 次</p>
+                                <p>发布时间: ${article.pastHours} 小时前</p>
+                                <p>作者: ${article.publisherName}</p>
+                                <button class="read-more-btn" data-hid="${article.hid}">阅读全文</button>
+                            </div>
+                        </div>
+                    `);
+                        });
+                        // 生成分页按钮
+                        generatePagination(response.data.pageInfo.pageNum, response.data.pageInfo.totalPage);
+                    } else {
+                        $('.article-page').html('<p>没有找到相关文章。</p>');
+                    }
+                },
+                error: function () {
+                    alert("加载文章数据失败，请稍后重试。");
+                }
+            });
+        }
+
+
+        // 分页按钮生成函数
+        function generatePagination(currentPage, totalPages) {
+            const paginationContainer = $('.pagination');
+            paginationContainer.empty();
+            // 显示上一页按钮
+            if (currentPage > 1) {
+                paginationContainer.append(`<button class="page-btn" data-page="${currentPage - 1}">上一页</button>`);
+            }
+            // 根据当前页生成周围的按钮
+            for (let i = Math.max(1, currentPage - 2); i <= Math.min(totalPages, currentPage + 2); i++) {
+                paginationContainer.append(`<button class="page-btn ${i === currentPage ? 'active' : ''}" data-page="${i}">${i}</button>`);
+            }
+            // 显示下一页按钮
+            if (currentPage < totalPages) {
+                paginationContainer.append(`<button class="page-btn" data-page="${currentPage + 1}">下一页</button>`);
+            }
+            // 使用事件委托减少事件绑定
+            $(document).off('click', '.page-btn').on('click', '.page-btn', function () {
+                const page = $(this).data('page');
+                loadArticlelist(page, 4, currentKeywords, selectedCategory);
+            });
+        }
+
+        // 搜索按钮事件
+        $('#search-btn').click(function () {
+            currentKeywords = $('#search-input').val();
+            loadArticlelist(1, 4, currentKeywords, selectedCategory);
+        });
+
+        // 输入框按回车触发搜索
+        $('#search-input').keypress(function (event) {
+            if (event.which === 13) {
+                currentKeywords = $('#search-input').val();
+                loadArticlelist(1, 4, currentKeywords, selectedCategory);
+            }
+        });
+
+        // 文章“阅读全文”按钮事件
+        $('.article-page').on('click', '.read-more-btn', function () {
+            const articleHid = $(this).data('hid');
+            window.location.href = `/articledetail.html?hid=${articleHid}`; // 跳转到文章详情页
+        });
+        // 初始化
+        function init() {
+            loadCategories(); // 加载分类列表
+            bindCategoryClick(); // 绑定分类点击事件
+        }
+
+        init(); // 页面初始化
+    });
+
+
+
+</script>
+</body>
+
+</html>
