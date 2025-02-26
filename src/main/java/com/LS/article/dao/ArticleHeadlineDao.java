@@ -9,6 +9,12 @@ import com.LS.article.pojo.vo.HeadlineQueryVo;
 import java.util.List;
 
 public interface ArticleHeadlineDao {
+    public boolean isFavorited(Integer userId, Integer hid);
+    void addFavorite(Integer userId, Integer hid);
+    void removeFavorite(Integer userId, Integer hid);
+
+
+
     /**
      * 批量添加附件
      *

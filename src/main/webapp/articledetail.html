@@ -9,8 +9,11 @@
           integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
     <link rel="stylesheet" href="css/main.css">
     <link rel="stylesheet" href="css/readarticle.css">
+<!--    收藏样式-->
+    <link rel="stylesheet " href="css/favorite.css">
     <script src="js/auth.js"></script>
     <script src="./js/jquery-3.6.0.min.js"></script>
+    <script src="js/axios.min.js"></script>
     <style>
         /*评论*/
         /* 增加选择器的特异性 */
@@ -80,6 +83,7 @@
         }
 
     </style>
+
 </head>
 
 <body>
@@ -112,9 +116,18 @@
                 </li>
                 <li class="nav-item" id="username-display" style="display: none;">
                     <a class="nav-link" href="#" id="logged-username"></a>
+                    <div id="user-dropdown" class="dropdown" style="display: none;">
+                        <a href="#" class="dropdown-item" id="profile-link">个人资料</a>
+                        <a href="#" class="dropdown-item" id="settings-link">设置</a>
+                    </div>
                 </li>
                 <li class="nav-item" id="login-register">
                     <a class="nav-link" href="login.html">登录 | 注册</a>
+                    <div class="dropdown-menu" id="user-dropdown1">
+                        <a class="dropdown-item" href="#">我的收藏</a>
+                        <a class="dropdown-item" href="#">资料修改</a>
+                        <a class="dropdown-item" href="#">退出登录</a>
+                    </div>
                 </li>
                 <li class="nav-item" id="logout" style="display: none;">
                     <a class="nav-link" href="#" onclick="logout()">退出</a>
@@ -122,6 +135,7 @@
             </ul>
         </div>
     </div>
+
 </nav>
 <section class="gallery-page">
     <div class="container" style="display: flex; align-items: flex-start; gap: 20px;">
@@ -139,6 +153,14 @@
                     <p id="article-author"></p>
                     <p id="article-pastHours"></p>
                     <p id="article-views"></p>
+                    <p>
+                        <!-- HTML结构 -->
+                        <button id="favorite-button" class="favorite-btn">
+                            <img id="favorite-icon" src="images/收藏.png" alt="收藏">
+                        </button>
+                    </p>
+
+
                 </div>
                 <!-- 设置图片宽度为100%并保持纵横比 -->
                 <img id="article-image" style="display: none; width: 100%; height: auto;"/>
@@ -397,5 +419,6 @@
     });
 </script>
 <script src="js/getattachments.js"></script>
+<script src="js/favorite.js"></script>
 </body>
 </html>

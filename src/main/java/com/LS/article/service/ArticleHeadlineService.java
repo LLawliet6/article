@@ -10,6 +10,12 @@ import java.util.Map;
 
 public interface ArticleHeadlineService {
 
+    boolean isFavorited(Integer userId, Integer hid);
+    void addFavorite(Integer userId, Integer hid);
+    void removeFavorite(Integer userId, Integer hid);
+
+
+
     /**
      * 批量添加附件
      *

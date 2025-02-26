@@ -3,22 +3,45 @@ package com.LS.article.dao.impl;
 import com.LS.article.dao.ArticleHeadlineDao;
 import com.LS.article.dao.BaseDao;
 import com.LS.article.pojo.ArticleAttachment;
+import com.LS.article.pojo.ArticleFavorite;
 import com.LS.article.pojo.ArticleHeadline;
 import com.LS.article.pojo.vo.HeadlineDetailVo;
 import com.LS.article.pojo.vo.HeadlinePageVo;
 import com.LS.article.pojo.vo.HeadlineQueryVo;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
 public class ArticleHeadlineDaoImpl extends BaseDao implements ArticleHeadlineDao {
+    // 判断用户是否已经收藏了文章
+    public boolean isFavorited(Integer userId, Integer hid) {
+        String sql = "SELECT COUNT(*) FROM article_favorite WHERE uid = ? AND hid = ?";
+        Integer count = baseQueryObject(Integer.class, sql, userId, hid);
+        return count != null && count > 0;
+    }
+
+    // 添加收藏记录
+    public void addFavorite(Integer userId, Integer hid) {
+        String sql = "INSERT INTO article_favorite (uid, hid, create_time) VALUES (?, ?, ?)";
+        baseUpdate(sql, userId, hid, LocalDateTime.now());
+    }
+
+    // 删除收藏记录
+    public void removeFavorite(Integer userId, Integer hid) {
+        String sql = "DELETE FROM article_favorite WHERE uid = ? AND hid = ?";
+        baseUpdate(sql, userId, hid);
+    }
+
+
     //根据hid获取附件列表
     @Override
     public List<ArticleAttachment> getAttachmentsByHid(int hid) {
         String sql = "SELECT aid, hid, file_name AS fileName, file_url AS fileUrl, upload_time AS uploadTime FROM article_attachment WHERE hid = ?";
         return baseQuery(ArticleAttachment.class, sql, hid);
     }
+
 
     // 批量添加附件
     @Override

@@ -37,6 +37,21 @@ public class ArticleHeadlineServiceImpl implements ArticleHeadlineService {
     */
 
 
+    @Override
+    public boolean isFavorited(Integer userId, Integer hid) {
+        return headlineDao.isFavorited(userId, hid);
+    }
+
+    @Override
+    public void addFavorite(Integer userId, Integer hid) {
+        headlineDao.addFavorite(userId, hid);
+    }
+
+    @Override
+    public void removeFavorite(Integer userId, Integer hid) {
+        headlineDao.removeFavorite(userId, hid);
+    }
+
     // 批量添加附件
     @Override
     public void uploadAttachments(List<ArticleAttachment> attachments) {

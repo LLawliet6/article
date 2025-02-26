@@ -1,0 +1,5 @@
+#favorite-icon {
+    width: 30px; /* 设置宽度 */
+    height:30x; /* 设置高度 */
+    object-fit: contain; /* 保持比例，防止变形 */
+}

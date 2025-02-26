@@ -31,6 +31,30 @@ import java.util.stream.Collectors;
 @WebServlet("/headline/*")
 public class ArticleHeadlineController extends BaseController {
     private ArticleHeadlineService headlineService = new ArticleHeadlineServiceImpl();
+    /**
+     * 收藏文章实现
+     */
+    protected void favorite(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        Integer hid = Integer.parseInt(req.getParameter("hid"));
+        String token = req.getHeader("token");
+        Long userId = JwtHelper.getUserId(token);
+
+        if (userId == null) {
+            WebUtil.writeJson(resp, Result.build(33,333,"没登录"));
+            return;
+        }
+
+        // 判断当前用户是否已收藏
+        boolean isFavorited = headlineService.isFavorited(userId.intValue(), hid);
+
+        if (isFavorited) {
+            headlineService.removeFavorite(userId.intValue(), hid);
+            WebUtil.writeJson(resp, Result.ok("取消收藏成功"));
+        } else {
+            headlineService.addFavorite(userId.intValue(), hid);
+            WebUtil.writeJson(resp, Result.ok("收藏成功"));
+        }
+    }
 
     /**
      * 删除文章实现
