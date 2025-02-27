@@ -40,21 +40,49 @@ public class ArticleHeadlineController extends BaseController {
         Long userId = JwtHelper.getUserId(token);
 
         if (userId == null) {
-            WebUtil.writeJson(resp, Result.build(33,333,"没登录"));
+            WebUtil.writeJson(resp, Result.build(33, 333, "未登录"));
             return;
         }
 
         // 判断当前用户是否已收藏
         boolean isFavorited = headlineService.isFavorited(userId.intValue(), hid);
 
+        String resultMessage;
         if (isFavorited) {
+            // 如果已经收藏，取消收藏
             headlineService.removeFavorite(userId.intValue(), hid);
-            WebUtil.writeJson(resp, Result.ok("取消收藏成功"));
+            resultMessage = "未收藏";  // 返回“未收藏”，以便前端更新
         } else {
+            // 如果没有收藏，进行收藏
             headlineService.addFavorite(userId.intValue(), hid);
-            WebUtil.writeJson(resp, Result.ok("收藏成功"));
+            resultMessage = "已收藏";  // 返回“已收藏”，以便前端更新
+        }
+
+        // 返回结果，前端根据此信息更新按钮状态
+        WebUtil.writeJson(resp, Result.ok(resultMessage));
+    }
+    protected void favoriteStatus(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        Integer hid = Integer.parseInt(req.getParameter("hid"));
+        String token = req.getHeader("token");
+        Long userId = JwtHelper.getUserId(token);
+
+        if (userId == null) {
+            WebUtil.writeJson(resp, Result.build(33, 333, "未登录"));
+            return;
+        }
+
+        // 判断当前用户是否已收藏
+        boolean isFavorited = headlineService.isFavorited(userId.intValue(), hid);
+
+        // 返回当前收藏状态
+        if (isFavorited) {
+            WebUtil.writeJson(resp, Result.ok("已收藏"));
+        } else {
+            WebUtil.writeJson(resp, Result.ok("未收藏"));
         }
     }
+
+
 
     /**
      * 删除文章实现
