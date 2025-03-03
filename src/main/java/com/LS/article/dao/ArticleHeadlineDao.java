@@ -74,5 +74,7 @@ public interface ArticleHeadlineDao {
 
 
     List<ArticleAttachment> getAttachmentsByHid(int hid);
+
+    List<HeadlinePageVo> getMyFavorites(Integer userId);
 }
 

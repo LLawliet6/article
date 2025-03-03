@@ -3,7 +3,6 @@ package com.LS.article.dao.impl;
 import com.LS.article.dao.ArticleHeadlineDao;
 import com.LS.article.dao.BaseDao;
 import com.LS.article.pojo.ArticleAttachment;
-import com.LS.article.pojo.ArticleFavorite;
 import com.LS.article.pojo.ArticleHeadline;
 import com.LS.article.pojo.vo.HeadlineDetailVo;
 import com.LS.article.pojo.vo.HeadlinePageVo;
@@ -42,6 +41,34 @@ public class ArticleHeadlineDaoImpl extends BaseDao implements ArticleHeadlineDa
         return baseQuery(ArticleAttachment.class, sql, hid);
     }
 
+    // 获取当前用户收藏的文章列表
+    @Override
+    public List<HeadlinePageVo> getMyFavorites(Integer userId) {
+        String sql = """
+                SELECT
+                    ah.hid,
+                    ah.title,
+                    ah.type,
+                    at.tname AS typeName,
+                    ah.page_views AS pageViews,
+                    TIMESTAMPDIFF(HOUR, ah.create_time, NOW()) AS pastHours,
+                    ah.publisher,
+                    au.username AS publisherName,
+                    ah.image_url AS imageUrl
+                FROM
+                    article_favorite af
+                JOIN
+                    article_headline ah ON af.hid = ah.hid
+                JOIN
+                    article_user au ON ah.publisher = au.uid
+                JOIN
+                    article_type at ON ah.type = at.tid
+                WHERE
+                    af.uid = ? AND ah.is_deleted = 0
+                """;
+        return baseQuery(HeadlinePageVo.class, sql, userId);
+    }
+
 
     // 批量添加附件
     @Override
@@ -55,7 +82,7 @@ public class ArticleHeadlineDaoImpl extends BaseDao implements ArticleHeadlineDa
 
         for (ArticleAttachment attachment : attachments) {
             System.out.println("准备插入附件：" + attachment);
-            paramsList.add(new Object[] {
+            paramsList.add(new Object[]{
                     attachment.getHid(),
                     attachment.getFileName(),
                     attachment.getFileUrl()
@@ -70,7 +97,6 @@ public class ArticleHeadlineDaoImpl extends BaseDao implements ArticleHeadlineDa
             e.printStackTrace();
         }
     }
-
 
 
     @Override
@@ -96,25 +122,25 @@ public class ArticleHeadlineDaoImpl extends BaseDao implements ArticleHeadlineDa
 //                    is_deleted = 0
 //                """;
         String sql = """
-            SELECT
-                ah.hid,
-                ah.title,
-                ah.type,
-                at.tname AS typeName,
-                ah.page_views AS pageViews,
-                TIMESTAMPDIFF(HOUR, ah.create_time, NOW()) AS pastHours,
-                ah.publisher,
-                au.username AS publisherName,
-                ah.image_url AS imageUrl
-            FROM
-                article_headline ah
-            JOIN
-                article_user au ON ah.publisher = au.uid
-            JOIN
-                article_type at ON ah.type = at.tid
-            WHERE
-                ah.is_deleted = 0
-            """;
+                SELECT
+                    ah.hid,
+                    ah.title,
+                    ah.type,
+                    at.tname AS typeName,
+                    ah.page_views AS pageViews,
+                    TIMESTAMPDIFF(HOUR, ah.create_time, NOW()) AS pastHours,
+                    ah.publisher,
+                    au.username AS publisherName,
+                    ah.image_url AS imageUrl
+                FROM
+                    article_headline ah
+                JOIN
+                    article_user au ON ah.publisher = au.uid
+                JOIN
+                    article_type at ON ah.type = at.tid
+                WHERE
+                    ah.is_deleted = 0
+                """;
 
         if (headlineQueryVo.getType() != 0) {
             sql = sql.concat(" and type = ? ");
@@ -233,9 +259,9 @@ public class ArticleHeadlineDaoImpl extends BaseDao implements ArticleHeadlineDa
 //    }
     public int addArticleHeadline(ArticleHeadline articleHeadline) {
         String sql = """
-            insert into article_headline (title, article, type, publisher, page_views, create_time, update_time, is_deleted, image_url)
-            values (?, ?, ?, ?, 0, now(), now(), 0, ?)
-            """;
+                insert into article_headline (title, article, type, publisher, page_views, create_time, update_time, is_deleted, image_url)
+                values (?, ?, ?, ?, 0, now(), now(), 0, ?)
+                """;
         baseUpdate(sql,
                 articleHeadline.getTitle(),
                 articleHeadline.getArticle(),
@@ -278,17 +304,17 @@ public class ArticleHeadlineDaoImpl extends BaseDao implements ArticleHeadlineDa
     public int update(ArticleHeadline articleHeadline) {
 
         String sql = """
-        update 
-            article_headline
-        set
-            title = ?,
-            article = ?,
-            type = ?,
-            update_time = now(),
-            image_url = ? -- 确保图片路径更新
-        where 
-            hid = ?
-        """;
+                update 
+                    article_headline
+                set
+                    title = ?,
+                    article = ?,
+                    type = ?,
+                    update_time = now(),
+                    image_url = ? -- 确保图片路径更新
+                where 
+                    hid = ?
+                """;
 
         return baseUpdate(sql,
                 articleHeadline.getTitle(),

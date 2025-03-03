@@ -66,9 +66,9 @@ $(document).ready(function() {
         const img = $("#favorite-icon");
 
         if (message === "已收藏") {
-            img.attr("src", "images/取消收藏.png");  // 更新图片为 取消收藏
-        } else {
             img.attr("src", "images/收藏.png");  // 更新图片为 收藏
+        } else {
+            img.attr("src", "images/取消收藏.png");  // 更新图片为取消 收藏
         }
     }
 });

@@ -1,9 +1,7 @@
 package com.LS.article.service.impl;
 
 import com.LS.article.dao.ArticleHeadlineDao;
-import com.LS.article.dao.UserDao;
 import com.LS.article.dao.impl.ArticleHeadlineDaoImpl;
-import com.LS.article.dao.impl.UserDaoImpl;
 import com.LS.article.pojo.ArticleAttachment;
 import com.LS.article.pojo.ArticleHeadline;
 import com.LS.article.pojo.vo.HeadlineDetailVo;
@@ -11,7 +9,6 @@ import com.LS.article.pojo.vo.HeadlinePageVo;
 import com.LS.article.pojo.vo.HeadlineQueryVo;
 import com.LS.article.service.ArticleHeadlineService;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -119,6 +116,11 @@ public class ArticleHeadlineServiceImpl implements ArticleHeadlineService {
     @Override
     public List<ArticleAttachment> getAttachmentsByHid(int hid) {
         return headlineDao.getAttachmentsByHid(hid);
+    }
+ //获取我的收藏
+    @Override
+    public List<HeadlinePageVo> getMyFavorites(Integer userId) {
+        return headlineDao.getMyFavorites(userId);
     }
 }
 

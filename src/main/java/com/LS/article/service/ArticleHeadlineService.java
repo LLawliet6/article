@@ -3,6 +3,7 @@ package com.LS.article.service;
 import com.LS.article.pojo.ArticleAttachment;
 import com.LS.article.pojo.ArticleHeadline;
 import com.LS.article.pojo.vo.HeadlineDetailVo;
+import com.LS.article.pojo.vo.HeadlinePageVo;
 import com.LS.article.pojo.vo.HeadlineQueryVo;
 
 import java.util.List;
@@ -60,4 +61,6 @@ public interface ArticleHeadlineService {
     List<ArticleHeadline> findArticlesByTypeId(int typeId);
 
     List<ArticleAttachment> getAttachmentsByHid(int hid);
+
+    List<HeadlinePageVo> getMyFavorites(Integer userId);
 }

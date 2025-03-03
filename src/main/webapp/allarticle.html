@@ -8,7 +8,14 @@
     <link rel="stylesheet" href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/4.0.0/css/bootstrap.min.css"
           integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
     <link rel="stylesheet" href="css/main.css">
-    <script src="./js/jquery-3.6.0.min.js"></script>
+    <script src="js/jquery3.5.1.js"></script>
+    <script src="js/bootstrap.min.js"></script>
+
+    <script>
+        $(document).ready(function () {
+            $('.dropdown-toggle').dropdown();
+        });
+    </script>
     <link rel="stylesheet" href="css/readarticle.css">
     <link rel="stylesheet" href="css/article-list.css">
 </head>
@@ -41,14 +48,18 @@
                 <li class="nav-item">
                     <a class="nav-link" href="articlemanage.html">我的文章</a>
                 </li>
-                <li class="nav-item" id="username-display" style="display: none;">
-                    <a class="nav-link" href="#" id="logged-username"></a>
+                <li class="nav-item dropdown" id="username-display" style="display: none;">
+                    <a class="nav-link dropdown-toggle" href="#" id="logged-username" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></a>
+                    <div class="dropdown-menu" aria-labelledby="logged-username">
+                        <a class="dropdown-item" href="myfavorite.html">我的收藏</a>
+                        <a class="dropdown-item" href="settings.html">设置</a>
+                        <div class="dropdown-divider"></div>
+                        <a class="dropdown-item" href="#" onclick="logout()">退出</a> <!-- 退出放入下拉菜单内 -->
+                    </div>
                 </li>
-                <li class="nav-item" id="login-register">
+                <!-- 登录注册按钮 -->
+                <li class="nav-item" id="login-register" style="display: none;">
                     <a class="nav-link" href="login.html">登录 | 注册</a>
-                </li>
-                <li class="nav-item" id="logout" style="display: none;">
-                    <a class="nav-link" href="#" onclick="logout()">退出</a>
                 </li>
             </ul>
         </div>

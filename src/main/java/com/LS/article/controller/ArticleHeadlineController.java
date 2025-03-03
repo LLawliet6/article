@@ -3,6 +3,7 @@ package com.LS.article.controller;
 import com.LS.article.common.Result;
 import com.LS.article.pojo.ArticleAttachment;
 import com.LS.article.pojo.ArticleHeadline;
+import com.LS.article.pojo.vo.HeadlinePageVo;
 import com.LS.article.service.ArticleHeadlineService;
 import com.LS.article.service.impl.ArticleHeadlineServiceImpl;
 import com.LS.article.util.JwtHelper;
@@ -82,7 +83,23 @@ public class ArticleHeadlineController extends BaseController {
         }
     }
 
-//    MyFavoritesList()
+    protected void myFavorites(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        // 获取当前登录用户
+        String token = request.getHeader("token");
+        Long userId = JwtHelper.getUserId(token);
+
+        if (userId == null) {
+            WebUtil.writeJson(response, Result.build(33, 333, "未登录"));
+            return;
+        }
+
+        // 查询收藏文章列表
+        List<HeadlinePageVo> favoriteList = headlineService.getMyFavorites(userId.intValue());
+
+        // 返回结果
+        WebUtil.writeJson(response, Result.ok(favoriteList));
+    }
+
 
 
 

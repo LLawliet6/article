@@ -198,7 +198,6 @@
                 <thead>
                 <tr>
                     <th>标题</th>
-                    <th>作者</th>
                     <th>类别</th>
                     <th>浏览量</th>
                     <th>发布时间</th>
@@ -267,61 +266,59 @@
                 });
             }
         }
-        // 加载文章
-        function loadMyArticles(pageNum, pageSize) {
+
+// 加载收藏的文章
+        function loadMyArticles() {
             if (!currentUser) {
                 setTimeout(function () {
                     window.location.href = "login.html";
                 }, 0);
                 return;
             }
+
+            const token = localStorage.getItem('token'); // 获取 token
+            if (!token) {
+                alert("未登录或登录已过期，请重新登录！");
+                window.location.href = "login.html";
+                return;
+            }
+
             $.ajax({
-                url: '/portal/findArticlePage',
+                url: '/headline/myFavorites', // 收藏文章的接口
                 method: 'POST',
-                contentType: 'application/json',
-                data: JSON.stringify({ pageNum, pageSize, type: 0 }),
+                headers: { 'token': token }, // 这里加上 token
                 success: function (response) {
                     if (response.code === 200) {
-                        const pageInfo = response.data.pageInfo;
-                        const articles = pageInfo.pageData;
-                        const totalPages = pageInfo.totalPage;
-                        // 清空表格内容
+                        const articles = response.data; // 这里是数组，直接赋值
+                        console.log("articles:" + JSON.stringify(articles));
                         $('.my-articles-page').empty();
-                        // 判断是否为管理员
-                        let filteredArticles;
-                        if (currentUser.username === "admin") {
-                            // 管理员加载全部文章
-                            filteredArticles = articles;
-                        } else {
-                            // 普通用户只加载自己发布的文章
-                            filteredArticles = articles.filter(article => article.publisher === currentUser.uid);
-                        }
-                        // 展示文章
-                        if (filteredArticles.length > 0) {
-                            filteredArticles.forEach(article => {
+
+                        if (articles.length > 0) {
+                            articles.forEach(article => {
                                 $('.my-articles-page').append(`
-                                <tr data-hid="${article.hid}">
-                                    <td>${article.title}</td>
-                                    <td>${article.publisherName}</td>
-                                    <td>${article.typeName}</td>
-                                    <td>${article.pageViews}</td>
-                                    <td>${article.pastHours} 小时前</td>
-                                    <td>
-                                        <button class="edit-btn" data-hid="${article.hid}">修改</button>
-                                        <button class="delete-btn" data-hid="${article.hid}">删除</button>
-                                    </td>
-                                </tr>
-                            `);
+                            <tr data-hid="${article.hid}">
+                                <td>${article.title}</td>
+                                <td>${article.typeName}</td>
+                                <td>${article.pageViews}</td>
+                                <td>${article.pastHours}</td>
+                                <td>
+                                    <button class="view-btn" data-hid="${article.hid}">查看文章</button>
+                                </td>
+                            </tr>
+                        `);
                             });
                         } else {
-                            $('.my-articles-page').html('<tr><td colspan="5" style="text-align: center;">暂无文章。</td></tr>');
+                            $('.my-articles-page').html('<tr><td colspan="5" style="text-align: center;">暂无收藏文章。</td></tr>');
                         }
 
-                        // 生成分页
-                        generatePagination(pageInfo.pageNum, totalPages);
-                        bindArticleButtons();
+                        // 绑定查看按钮的点击事件
+                        $('.view-btn').on('click', function () {
+                            const hid = $(this).data('hid');  // 获取当前点击按钮对应的文章ID
+                            window.location.href = `articledetail.html?hid=${hid}`;  // 跳转到文章详情页，并传递hid
+                        });
+
                     } else {
-                        alert("加载文章失败：" + response.message);
+                        alert("加载收藏文章失败：" + response.message);
                     }
                 },
                 error: function () {
@@ -329,6 +326,9 @@
                 }
             });
         }
+
+
+
         // 生成分页功能
         function generatePagination(currentPage, totalPages) {
             $('.pagination').empty();
@@ -345,41 +345,6 @@
                 const page = $(this).data('page');
                 loadMyArticles(page, 10); // 默认每页显示 10 条
             });
-        }
-
-        // 绑定修改和删除按钮事件
-        function bindArticleButtons() {
-            $('.edit-btn').click(function () {
-                const hid = $(this).data('hid');
-                // 跳转到编辑页面，并传递文章ID
-                window.location.href = `article-edit.html?hid=${hid}`;
-            });
-
-            $('.delete-btn').click(function () {
-                const hid = $(this).data('hid');
-                deleteArticle(hid);
-            });
-        }
-
-        // 删除文章
-        function deleteArticle(hid) {
-            if (confirm("确定要删除这篇文章吗？")) {
-                $.ajax({
-                    url: `/headline/removeByHid?hid=${hid}`,
-                    method: 'POST',
-                    success: function (response) {
-                        if (response.code === 200) {
-                            alert("文章删除成功！");
-                            loadMyArticles(1, 10); // 重新加载第一页
-                        } else {
-                            alert("删除失败：" + response.message);
-                        }
-                    },
-                    error: function () {
-                        alert("请求失败，请稍后重试。");
-                    }
-                });
-            }
         }
 
         // 初始化
