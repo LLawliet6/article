@@ -69,6 +69,11 @@ public class ArticleHeadlineDaoImpl extends BaseDao implements ArticleHeadlineDa
         return baseQuery(HeadlinePageVo.class, sql, userId);
     }
 
+    @Override
+    public int cancelFavorite(int hid) {
+        return  baseUpdate("DELETE FROM article_favorite WHERE hid = ?", hid);
+    }
+
 
     // 批量添加附件
     @Override

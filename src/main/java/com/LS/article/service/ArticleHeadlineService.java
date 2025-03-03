@@ -63,4 +63,6 @@ public interface ArticleHeadlineService {
     List<ArticleAttachment> getAttachmentsByHid(int hid);
 
     List<HeadlinePageVo> getMyFavorites(Integer userId);
+//取消收藏
+    int cancelFavorite(int hid);
 }

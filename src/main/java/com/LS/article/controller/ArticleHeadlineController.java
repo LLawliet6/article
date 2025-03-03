@@ -99,7 +99,11 @@ public class ArticleHeadlineController extends BaseController {
         // 返回结果
         WebUtil.writeJson(response, Result.ok(favoriteList));
     }
-
+    protected void cancelFavorite(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        int hid = Integer.parseInt(req.getParameter("hid"));
+        headlineService.cancelFavorite(hid);
+        WebUtil.writeJson(resp, Result.ok(null));
+    }
 
 
 

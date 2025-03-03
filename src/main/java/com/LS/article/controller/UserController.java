@@ -84,7 +84,7 @@ public class UserController extends BaseController{
     protected void login(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         // 接收用户名和密码
         /*{
-            "username":"zhangsan", //用户名
+            "username":"liushuai", //用户名
             "userPwd":"123456"     //明文密码
         }*/
         User paramUser = WebUtil.readJson(req, User.class);

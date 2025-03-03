@@ -122,5 +122,10 @@ public class ArticleHeadlineServiceImpl implements ArticleHeadlineService {
     public List<HeadlinePageVo> getMyFavorites(Integer userId) {
         return headlineDao.getMyFavorites(userId);
     }
+
+    @Override
+    public int cancelFavorite(int hid) {
+        return headlineDao.cancelFavorite(hid);
+    }
 }
 

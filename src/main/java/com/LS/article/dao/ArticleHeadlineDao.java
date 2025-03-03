@@ -76,5 +76,7 @@ public interface ArticleHeadlineDao {
     List<ArticleAttachment> getAttachmentsByHid(int hid);
 
     List<HeadlinePageVo> getMyFavorites(Integer userId);
+
+    int cancelFavorite(int hid);
 }
 

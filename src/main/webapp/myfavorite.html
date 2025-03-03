@@ -303,6 +303,7 @@
                                 <td>${article.pastHours}</td>
                                 <td>
                                     <button class="view-btn" data-hid="${article.hid}">查看文章</button>
+                                     <button class="cancel-btn" data-hid="${article.hid}">取消收藏</button>
                                 </td>
                             </tr>
                         `);
@@ -326,7 +327,37 @@
                 }
             });
         }
+    //取消收藏
+        $(document).on('click', '.cancel-btn', function() {
+            // 获取当前行的 hid
+            const hid = $(this).data('hid');
 
+            const token = localStorage.getItem('token'); // 获取 token
+            if (!token) {
+                alert("未登录或登录已过期，请重新登录！");
+                window.location.href = "login.html";
+                return;
+            }
+
+            // 发送取消收藏请求
+            $.ajax({
+                url: '/headline/cancelFavorite',
+                method: 'POST',
+                data: { hid: hid },
+                success: function(response) {
+                    if (response.code === 200) {
+                        // 取消收藏成功，移除对应的文章行
+                        $(`tr[data-hid="${hid}"]`).remove();
+                        console.log("取消收藏成功");
+                    } else {
+                        console.error("取消收藏失败:", response.message);
+                    }
+                },
+                error: function(xhr, status, error) {
+                    console.error("请求失败:", error);
+                }
+            });
+        });
 
 
         // 生成分页功能
