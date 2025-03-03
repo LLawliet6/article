@@ -10,10 +10,10 @@ $(document).ready(function() {
 
     // 获取 token
     const token = localStorage.getItem('token');
-    if (!token) {
-        alert("请先登录");
-        return;
-    }
+    // if (!token) {
+    //     alert("请先登录");
+    //     return;
+    // }
 
     // 确保 token 获取后再执行 checkIfFavorited
     checkIfFavorited(hid, token);
@@ -53,12 +53,11 @@ $(document).ready(function() {
                     // 根据返回的数据更新按钮状态
                     updateFavoriteButton(response.data.data);
                 } else {
-                    alert(response.data.message);  // 如果请求失败，提示错误
+                    console.error('Error:', error);  // 如果请求失败，提示错误
                 }
             })
             .catch(function(error) {
                 console.error('Error:', error);
-                alert("请求失败.");
             });
     }
 
