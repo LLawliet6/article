@@ -39,12 +39,10 @@ public class ArticleHeadlineController extends BaseController {
         Integer hid = Integer.parseInt(req.getParameter("hid"));
         String token = req.getHeader("token");
         Long userId = JwtHelper.getUserId(token);
-
         if (userId == null) {
             WebUtil.writeJson(resp, Result.build(33, 333, "未登录"));
             return;
         }
-
         // 判断当前用户是否已收藏
         boolean isFavorited = headlineService.isFavorited(userId.intValue(), hid);
 
@@ -92,7 +90,6 @@ public class ArticleHeadlineController extends BaseController {
             WebUtil.writeJson(response, Result.build(33, 333, "未登录"));
             return;
         }
-
         // 查询收藏文章列表
         List<HeadlinePageVo> favoriteList = headlineService.getMyFavorites(userId.intValue());
 

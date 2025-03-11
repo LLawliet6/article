@@ -234,7 +234,11 @@
         let currentUser = null; // 保存当前用户信息
         // 获取当前登录用户信息
         function getCurrentUser() {
-            const token = localStorage.getItem('token');
+            let token = sessionStorage.getItem("token");
+            // 如果 session 中没有，再检查 localStorage
+            if (!token) {
+                token = localStorage.getItem("token");
+            }
             if (token) {
                 $.ajax({
                     url: '/user/getUserInfo',

@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>后台管理模板</title>
+  <link rel="stylesheet" href="css/layui.css">
+  <link rel="stylesheet" href="css/font_awsome.css">
+  <script src="js/axios.min.js"></script>
+  <script src="js/jquery3.5.1.js"></script>
+</head>
+<script>
+  $(document).ready(function () {
+    // 监听侧边栏菜单的点击事件
+    $('.layui-nav-tree a[data-url]').on('click', function (e) {
+      e.preventDefault(); // 阻止默认跳转行为
+
+      var url = $(this).attr('data-url'); // 获取目标页面的 URL
+      var $layuiBody = $('.layui-body');
+
+      // 显示加载动画
+      $layuiBody.html('<div class="layui-loading">加载中...</div>');
+
+      // 通过 AJAX 加载目标页面
+      $layuiBody.load(url);
+    });
+  });
+
+</script>
+<body class="layui-layout-body">
+<div class="layui-layout layui-layout-admin">
+  <!-- 顶部导航栏 -->
+  <div class="layui-header">
+    <div class="layui-logo">
+      <img style="margin-left: -70px" src="svg/logo-no-background.svg" alt="Logo" width="350" height="70">
+    </div>
+    <ul class="layui-nav layui-layout-right">
+      <li class="layui-nav-item">
+        <a href="javascript:">
+          <img src="images/default.jpg" class="layui-nav-img">
+          <span>管理员</span>
+        </a>
+        <dl class="layui-nav-child">
+          <dd><a href="">基本资料</a></dd>
+          <dd><a href="">安全设置</a></dd>
+        </dl>
+      </li>
+      <li class="layui-nav-item"><a href="#" onclick="logout(); return false;">退出</a>
+
+      </li>
+    </ul>
+  </div>
+
+  <!-- 侧边栏 -->
+  <div class="layui-side layui-bg-black">
+    <div class="layui-side-scroll">
+      <ul class="layui-nav layui-nav-tree" lay-filter="test">
+        <li class="layui-nav-item layui-nav-itemed">
+          <a href="javascript:;">
+            <i class="layui-icon layui-icon-set"></i> 系统管理 <!-- Layui 图标 -->
+          </a>
+          <dl class="layui-nav-child">
+            <dd><a href="javascript:;"><i class="layui-icon layui-icon-user"></i> 用户管理</a></dd>
+            <dd><a href="javascript:;"><i class="layui-icon layui-icon-group"></i> 角色管理</a></dd>
+            <dd><a href="javascript:;"><i class="layui-icon layui-icon-auz"></i> 权限管理</a></dd>
+          </dl>
+        </li>
+        <li class="layui-nav-item">
+          <a href="javascript:;">
+            <i class="layui-icon layui-icon-template"></i> 内容管理 <!-- Layui 图标 -->
+          </a>
+          <dl class="layui-nav-child">
+            <dd><a href="javascript:;"><i class="layui-icon layui-icon-form"></i> 文章管理</a></dd>
+            <dd><a href="javascript:;" data-url="category-management.html"><i class="layui-icon layui-icon-note"></i> 分类管理</a></dd>
+            <dd><a href="javascript:;"><i class="layui-icon layui-icon-dialogue"></i> 评论管理</a></dd>
+          </dl>
+        </li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- 内容区域 -->
+  <div class="layui-body">
+    <div style="padding: 15px;">
+      <h1>欢迎使用后台管理系统</h1>
+      <p>这里是内容区域，你可以在这里添加你的页面内容。</p>
+    </div>
+  </div>
+
+  <!-- 底部 -->
+  <div class="layui-footer">
+    © Ls_animate后台管理系统
+  </div>
+</div>
+
+<script src="js/layui.js"></script>
+<script>
+  layui.use(['element', 'layer'], function(){
+    var element = layui.element;
+    var layer = layui.layer;
+  });
+</script>
+<script src="js/admin_login.js"></script>
+<script src="js/category_manage.js"></script>
+</body>
+</html>

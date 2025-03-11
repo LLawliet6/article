@@ -27,6 +27,45 @@ public class PortalController extends BaseController {
     private ArticleTypeService typeService = new ArticleTypeServiceImpl();
     private ArticleHeadlineService headlineService = new ArticleHeadlineServiceImpl();
 
+    // 添加分类
+    protected void addType(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        String tname = req.getParameter("tname");
+        ArticleType articleType = new ArticleType();
+        articleType.setTname(tname);
+        int result = typeService.addType(articleType);
+        if(result > 0) {
+            WebUtil.writeJson(resp, Result.ok("新增成功"));
+        } else {
+            WebUtil.writeJson(resp, Result.build(null, 400,"增加失败"));
+        }
+    }
+
+    // 更新分类
+    protected void updateType(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        int tid = Integer.valueOf(req.getParameter("tid"));
+        String tname = req.getParameter("tname");
+        ArticleType articleType = new ArticleType();
+        articleType.setTid(tid);
+        articleType.setTname(tname);
+        int result = typeService.updateType(articleType);
+        if(result > 0) {
+            WebUtil.writeJson(resp, Result.ok("更新成功"));
+        } else {
+            WebUtil.writeJson(resp, Result.build(null, 400,"更新失败"));
+        }
+    }
+
+    // 删除分类
+    protected void deleteType(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        int tid = Integer.valueOf(req.getParameter("tid"));
+        int result = typeService.deleteType(tid);
+        if(result > 0) {
+            WebUtil.writeJson(resp, Result.ok("删除成功"));
+        } else {
+            WebUtil.writeJson(resp, Result.build(null, 400,"删除失败"));
+        }
+    }
+
     /**
      * 附件
      */
@@ -103,38 +142,38 @@ public class PortalController extends BaseController {
     /**
      * 查询所有文章类型实现
      */
-//    protected void findAllTypes(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-//        // 查询所有的文章类型,装入Result响应给客户端
-//        List<ArticleType> articleTypeList = typeService.findAll();
-//        WebUtil.writeJson(resp, Result.ok(articleTypeList));
-//    }
     protected void findAllTypes(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        // 查询所有的文章类型
+        // 查询所有的文章类型,装入Result响应给客户端
         List<ArticleType> articleTypeList = typeService.findAll();
-
-        // 为每个类别查询对应的文章标题
-        List<Map<String, Object>> result = new ArrayList<>();
-        for (ArticleType type : articleTypeList) {
-            Map<String, Object> typeWithArticles = new HashMap<>();
-            typeWithArticles.put("tid", type.getTid());
-            typeWithArticles.put("tname", type.getTname());
-
-            // 根据类别ID查询该类别下的文章标题
-            List<ArticleHeadline> articles = headlineService.findArticlesByTypeId(type.getTid());
-            List<Map<String, Object>> articleTitles = new ArrayList<>();
-            for (ArticleHeadline article : articles) {
-                Map<String, Object> articleData = new HashMap<>();
-                articleData.put("title", article.getTitle());
-                articleData.put("hid", article.getHid());
-                articleData.put("isDeleted", article.getIsDeleted());
-                articleTitles.add(articleData);
-            }
-            // 将文章列表加入到类别数据中
-            typeWithArticles.put("articles", articleTitles);
-            result.add(typeWithArticles);
-        }
-        // 将类别及其对应的文章标题数据响应给客户端
-        WebUtil.writeJson(resp, Result.ok(result));
+        WebUtil.writeJson(resp, Result.ok(articleTypeList));
     }
+//    protected void findAllTypes(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+//        // 查询所有的文章类型
+//        List<ArticleType> articleTypeList = typeService.findAll();
+//
+//        // 为每个类别查询对应的文章标题
+//        List<Map<String, Object>> result = new ArrayList<>();
+//        for (ArticleType type : articleTypeList) {
+//            Map<String, Object> typeWithArticles = new HashMap<>();
+//            typeWithArticles.put("tid", type.getTid());
+//            typeWithArticles.put("tname", type.getTname());
+//
+//            // 根据类别ID查询该类别下的文章标题
+//            List<ArticleHeadline> articles = headlineService.findArticlesByTypeId(type.getTid());
+//            List<Map<String, Object>> articleTitles = new ArrayList<>();
+//            for (ArticleHeadline article : articles) {
+//                Map<String, Object> articleData = new HashMap<>();
+//                articleData.put("title", article.getTitle());
+//                articleData.put("hid", article.getHid());
+//                articleData.put("isDeleted", article.getIsDeleted());
+//                articleTitles.add(articleData);
+//            }
+//            // 将文章列表加入到类别数据中
+//            typeWithArticles.put("articles", articleTitles);
+//            result.add(typeWithArticles);
+//        }
+//        // 将类别及其对应的文章标题数据响应给客户端
+//        WebUtil.writeJson(resp, Result.ok(result));
+//    }
 
 }

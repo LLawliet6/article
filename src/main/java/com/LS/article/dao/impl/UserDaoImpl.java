@@ -14,7 +14,7 @@ public class UserDaoImpl extends BaseDao implements UserDao {
                 select
                     uid,
                     username,
-                    user_pwd userPwd
+                    user_pwd userPwd,role
                 from
                     article_user
                 where
@@ -30,7 +30,7 @@ public class UserDaoImpl extends BaseDao implements UserDao {
                 select
                     uid,
                     username,
-                    user_pwd userPwd
+                    user_pwd userPwd,role
                 from
                     article_user
                 where

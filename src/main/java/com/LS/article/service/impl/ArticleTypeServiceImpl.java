@@ -14,5 +14,20 @@ public class ArticleTypeServiceImpl implements ArticleTypeService {
     public List<ArticleType> findAll() {
         return typeDao.findAll();
     }
+
+    @Override
+    public Integer addType(ArticleType articleType) {
+        return typeDao.addType(articleType);
+    }
+
+    @Override
+    public Integer updateType(ArticleType articleType) {
+        return typeDao.updateType(articleType);
+    }
+
+    @Override
+    public Integer deleteType(Integer tid) {
+        return typeDao.deleteType(tid);
+    }
 }
 

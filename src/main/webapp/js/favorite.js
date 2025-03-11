@@ -7,9 +7,12 @@ $(document).ready(function() {
         alert("没有找到文章ID");
         return;
     }
+    let token = sessionStorage.getItem("token");
+    // 如果 session 中没有，再检查 localStorage
+    if (!token) {
+        token = localStorage.getItem("token");
+    }
 
-    // 获取 token
-    const token = localStorage.getItem('token');
     // if (!token) {
     //     alert("请先登录");
     //     return;
