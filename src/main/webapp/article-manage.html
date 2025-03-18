@@ -1,0 +1,41 @@
+<!-- article-manage.html -->
+<script src="js/ckeditor.js"></script>
+<script src="js/layui.js"></script>
+<div style="padding: 30px;">
+    <h1 style="display: inline-block;">文章管理</h1>
+
+    <!-- 筛选区域 -->
+    <div class="layui-form" style="margin-bottom: 20px; display: flex; align-items: center; gap: 10px;">
+        <!-- 分类下拉框（动态加载） -->
+        <select id="category-select" lay-filter="category">
+            <option value="">请选择分类</option>
+        </select>
+        <!-- 关键字输入框 -->
+        <input type="text" id="search-input" placeholder="请输入关键字" class="layui-input" style="width: 200px;">
+        <!-- 搜索按钮 -->
+        <button id="search-btn" class="layui-btn layui-btn-normal">搜索</button>
+    </div>
+
+
+    <!-- 文章列表区域 -->
+    <table class="layui-table" id="userTable">
+        <thead>
+        <tr>
+            <th>文章标题</th>
+            <th>分类</th>
+            <th>作者</th>
+            <th>浏览量</th>
+            <th>操作</th>
+        </tr>
+        </thead>
+        <tbody id="article-page">
+        <!-- 动态生成文章列表 -->
+        </tbody>
+    </table>
+
+    <!-- 分页区域 -->
+    <ul id="pagination" class="pagination" style="list-style: none; padding: 0; display: flex;"></ul>
+</div>
+
+
+

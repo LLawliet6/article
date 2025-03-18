@@ -6,7 +6,7 @@
   <title>后台管理模板</title>
   <link rel="stylesheet" href="css/layui.css">
   <link rel="stylesheet" href="css/font_awsome.css">
-  <script src="js/axios.min.js"></script>
+<!--  <script src="js/axios.min.js"></script>-->
   <script src="js/jquery3.5.1.js"></script>
 </head>
 <script>
@@ -37,7 +37,7 @@
     <ul class="layui-nav layui-layout-right">
       <li class="layui-nav-item">
         <a href="javascript:">
-          <img src="images/default.jpg" class="layui-nav-img">
+          <img src="images/avtor.jpeg" class="layui-nav-img">
           <span>管理员</span>
         </a>
         <dl class="layui-nav-child">
@@ -60,7 +60,7 @@
             <i class="layui-icon layui-icon-set"></i> 系统管理 <!-- Layui 图标 -->
           </a>
           <dl class="layui-nav-child">
-            <dd><a href="javascript:;"><i class="layui-icon layui-icon-user"></i> 用户管理</a></dd>
+            <dd><a href="javascript:;"data-url="user-manage.html"><i class="layui-icon layui-icon-user"></i> 用户管理</a></dd>
             <dd><a href="javascript:;"><i class="layui-icon layui-icon-group"></i> 角色管理</a></dd>
             <dd><a href="javascript:;"><i class="layui-icon layui-icon-auz"></i> 权限管理</a></dd>
           </dl>
@@ -70,7 +70,7 @@
             <i class="layui-icon layui-icon-template"></i> 内容管理 <!-- Layui 图标 -->
           </a>
           <dl class="layui-nav-child">
-            <dd><a href="javascript:;"><i class="layui-icon layui-icon-form"></i> 文章管理</a></dd>
+            <dd><a href="javascript:;"data-url="article-manage.html"><i class="layui-icon layui-icon-form"></i> 文章管理</a></dd>
             <dd><a href="javascript:;" data-url="category-management.html"><i class="layui-icon layui-icon-note"></i> 分类管理</a></dd>
             <dd><a href="javascript:;"><i class="layui-icon layui-icon-dialogue"></i> 评论管理</a></dd>
           </dl>
@@ -101,6 +101,9 @@
   });
 </script>
 <script src="js/admin_login.js"></script>
+<script src="js/user_manage.js"></script>
 <script src="js/category_manage.js"></script>
+<!--<script src="js/ckeditor.js"></script>-->
+<!--<script src="js/article_manage.js"></script>-->
 </body>
 </html>

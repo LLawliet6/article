@@ -22,6 +22,32 @@ public class UserController extends BaseController{
     private UserService userService = new UserServiceImpl();
 
     /**
+     * 获取全部普通用户
+     */
+    protected void findAll(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        // 调用服务层方法查询用户列表
+        Result result = Result.ok(userService.findAll());
+        // 向客户端响应查询结果
+        WebUtil.writeJson(resp,result);
+    }
+
+    /**
+     * 删除用户
+     */
+    protected void removeUser(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        // 接收用户id
+        Integer userId = Integer.parseInt(req.getParameter("uid"));
+        // 调用服务层方法完成删除
+        Integer rows = userService.removeUser(userId);
+        // 根据删除结果处理响应值
+        Result result = Result.ok(null);
+        if(rows == 0){
+            result=Result.build(null,400,"删除失败");
+        }
+        WebUtil.writeJson(resp,result);
+    }
+
+    /**
      * 完成注册的业务接口
      */
     protected void regist(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {

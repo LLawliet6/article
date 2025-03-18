@@ -6,6 +6,8 @@ import com.LS.article.pojo.User;
 import com.LS.article.service.UserService;
 import com.LS.article.util.MD5Util;
 
+import java.util.List;
+
 public class UserServiceImpl implements UserService {
     private UserDao userDao =new UserDaoImpl();
     @Override
@@ -25,6 +27,16 @@ public class UserServiceImpl implements UserService {
         registUser.setUserPwd(MD5Util.encrypt(registUser.getUserPwd()));
 
         return userDao.insertUser(registUser);
+    }
+
+    @Override
+    public Integer removeUser(Integer userId) {
+        return userDao.deleteUser(userId);
+    }
+
+    @Override
+    public List<User> findAll() {
+        return userDao.findAll();
     }
 }
 

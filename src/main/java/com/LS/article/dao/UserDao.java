@@ -2,6 +2,8 @@ package com.LS.article.dao;
 
 import com.LS.article.pojo.User;
 
+import java.util.List;
+
 public interface UserDao {
 
 
@@ -12,5 +14,9 @@ public interface UserDao {
 
 
     Integer insertUser(User registUser);
+
+    Integer deleteUser(Integer userId);
+
+    List<User> findAll();
 }
 

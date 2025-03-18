@@ -51,5 +51,26 @@ public class UserDaoImpl extends BaseDao implements UserDao {
                 registUser.getUserPwd()
         );
     }
+
+    @Override
+    public Integer deleteUser(Integer userId) {
+        String sql = """
+                delete from article_user where uid = ?
+                """;
+        return baseUpdate(sql, userId);
+    }
+
+    @Override
+    public List<User> findAll() {
+        String sql = """
+                select
+                    uid,
+                    username,
+                    user_pwd userPwd,role
+                from
+                    article_user where role=0
+                """;
+        return  baseQuery(User.class, sql);
+    }
 }
 
