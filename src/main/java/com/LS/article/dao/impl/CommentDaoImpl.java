@@ -24,7 +24,7 @@ public class CommentDaoImpl extends BaseDao implements CommentDao {
         }
     }
 
-//    @Override
+    //    @Override
 //    public List<Comment> findCommentsByArticleId(int articleId) {
 //        String sql = "SELECT c.cid, " +
 //                "       c.article_id AS articleId, " +
@@ -39,27 +39,31 @@ public class CommentDaoImpl extends BaseDao implements CommentDao {
 //
 //        return baseQuery(Comment.class, sql, articleId);
 //    }
-public List<Comment> findCommentsByArticleId(int articleId) {
-    String sql = "SELECT c.cid, " +
-            "       c.article_id AS articleId, " +
-            "       c.user_id AS userId, " +
-            "       c.content, " +
-            "       c.create_time AS createTime, " +
-            "       u.username, " +
-            "       c.pid, " +
-            "       COALESCE(ru.username, '') AS replyUsername " + // 如果 ru.username 为 null，返回空字符串
-            "FROM comment c " +
-            "JOIN article_user u ON c.user_id = u.uid " +
-            "LEFT JOIN comment rc ON c.pid = rc.cid " +
-            "LEFT JOIN article_user ru ON rc.user_id = ru.uid " +
-            "WHERE c.article_id = ? " +
-            "ORDER BY c.create_time DESC";
+    public List<Comment> findCommentsByArticleId(int articleId) {
+        String sql = "SELECT c.cid, " +
+                "       c.article_id AS articleId, " +
+                "       c.user_id AS userId, " +
+                "       c.content, " +
+                "       c.create_time AS createTime, " +
+                "       u.username, " +
+                "       c.pid, " +
+                "       COALESCE(ru.username, '') AS replyUsername " + // 如果 ru.username 为 null，返回空字符串
+                "FROM comment c " +
+                "JOIN article_user u ON c.user_id = u.uid " +
+                "LEFT JOIN comment rc ON c.pid = rc.cid " +
+                "LEFT JOIN article_user ru ON rc.user_id = ru.uid " +
+                "WHERE c.article_id = ? " +
+                "ORDER BY c.create_time DESC";
 
 
-    return baseQuery(Comment.class, sql, articleId);
-}
+        return baseQuery(Comment.class, sql, articleId);
+    }
 
-
+    @Override
+    public int deletById(int cid) {
+        String sql = "delete from comment where cid = ?";
+        return baseUpdate(sql,cid);
+    }
 
 
 //    public List<Comment> findChildComments(int parentId) {

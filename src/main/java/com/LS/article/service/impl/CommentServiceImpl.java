@@ -28,6 +28,13 @@ public class CommentServiceImpl implements CommentService {
         List<Comment> commentTree = buildCommentTree(comments);
         return Result.ok(commentTree);
     }
+
+    @Override
+    public Result deleteComment(int cid) {
+        int rowsAffected=commentDao.deletById(cid);
+        return rowsAffected > 0 ? Result.ok(null) : Result.build(null, 500, "评论删除失败");
+    }
+
     /**
      * 构建评论树的方法，将评论按照父子关系进行嵌套
      */

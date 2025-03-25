@@ -84,6 +84,15 @@ public class CommentController extends BaseController {
 
         WebUtil.writeJson(resp, result);
     }
+    /**
+     * 通过评论ID删除评论
+     */
+    protected void deleteComment(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        int cid = Integer.parseInt(req.getParameter("cid"));
+        Result result = commentService.deleteComment(cid);
+        WebUtil.writeJson(resp, result);
+    }
+
 }
 
 

@@ -11,5 +11,6 @@ public interface CommentDao {
      //根据文章ID查询评论列表
     List<Comment> findCommentsByArticleId(int articleId);
 
+    int deletById(int cid);
 }
 

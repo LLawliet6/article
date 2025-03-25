@@ -16,6 +16,8 @@ public interface CommentService {
      * 通过文章id查找评论
      */
     Result<List<Comment>> findCommentsByArticleId(int articleId);   // 根据文章ID查询评论
+
+    Result deleteComment(int cid);
 }
 
 

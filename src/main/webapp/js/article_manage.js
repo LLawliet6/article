@@ -1,5 +1,5 @@
 
-$(function () {
+
     layui.use(['form', 'laypage', 'layer', 'jquery'], function () {
         var form = layui.form,
             laypage = layui.laypage,
@@ -14,6 +14,8 @@ $(function () {
                 .then(data => {
                     if (data.code === 200) {
                         const selectElem = document.getElementById("category-select");
+
+                        console.log('Select element:', selectElem); // 检查结果是否为null
                         selectElem.innerHTML = '<option value="">请选择分类</option>';
                         data.data.forEach(cat => {
                             $(selectElem).append(`<option value="${cat.tid}">${cat.tname}</option>`);
@@ -224,4 +226,4 @@ $(function () {
         loadCategories();
         loadArticlePage(1, 4);
     });
-});
+
