@@ -1,6 +1,7 @@
 package com.LS.article.service.impl;
 
 import com.LS.article.dao.ArticleHeadlineDao;
+import com.LS.article.dao.BaseDao;
 import com.LS.article.dao.impl.ArticleHeadlineDaoImpl;
 import com.LS.article.pojo.ArticleAttachment;
 import com.LS.article.pojo.ArticleHeadline;
@@ -9,11 +10,13 @@ import com.LS.article.pojo.vo.HeadlinePageVo;
 import com.LS.article.pojo.vo.HeadlineQueryVo;
 import com.LS.article.service.ArticleHeadlineService;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
-public class ArticleHeadlineServiceImpl implements ArticleHeadlineService {
+public class ArticleHeadlineServiceImpl extends BaseDao implements ArticleHeadlineService {
     private ArticleHeadlineDao headlineDao = new ArticleHeadlineDaoImpl();
 
     /*
@@ -127,5 +130,25 @@ public class ArticleHeadlineServiceImpl implements ArticleHeadlineService {
     public int cancelFavorite(int hid) {
         return headlineDao.cancelFavorite(hid);
     }
+
+    @Override
+    public void updateAttachmentsHid(int hid, List<Integer> attachmentIds) {
+        if (attachmentIds == null || attachmentIds.isEmpty()) {
+            return;
+        }
+
+        String sql = "UPDATE article_attachment SET hid = ? WHERE aid IN (" +
+                attachmentIds.stream().map(id -> "?").collect(Collectors.joining(",")) + ")";
+        List<Object> params = new ArrayList<>();
+        params.add(hid);
+        params.addAll(attachmentIds);
+
+        baseUpdate(sql, params.toArray());
+    }
+
+    public int uploadAttachment(ArticleAttachment attachment) {
+        return headlineDao.addAttachment(attachment);
+    }
+
 }
 

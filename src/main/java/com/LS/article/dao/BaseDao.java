@@ -10,48 +10,38 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class BaseDao {
-    // 公共的查询方法  返回的是单个对象
-//    public <T> T baseQueryObject(Class<T> clazz, String sql, Object ... args) {
-//        T t = null;
-//        Connection connection = JDBCUtil.getConnection();
-//        PreparedStatement preparedStatement = null;
-//        ResultSet resultSet = null;
-//        int rows = 0;
-//        try {
-//            // 准备语句对象
-//            preparedStatement = connection.prepareStatement(sql);
-//            // 设置语句上的参数
-//            for (int i = 0; i < args.length; i++) {
-//                preparedStatement.setObject(i + 1, args[i]);
-//            }
-//
-//            // 执行 查询
-//            resultSet = preparedStatement.executeQuery();
-//            if (resultSet.next()) {
-//                t = (T) resultSet.getObject(1);
-//            }
-//        } catch (Exception e) {
-//            throw new RuntimeException(e);
-//        } finally {
-//            if (null != resultSet) {
-//                try {
-//                    resultSet.close();
-//                } catch (SQLException e) {
-//                    throw new RuntimeException(e);
-//                }
-//            }
-//            if (null != preparedStatement) {
-//                try {
-//                    preparedStatement.close();
-//                } catch (SQLException e) {
-//                    throw new RuntimeException(e);
-//                }
-//
-//            }
-//            JDBCUtil.releaseConnection();
-//        }
-//        return t;
-//    }
+    public List<Integer> baseBatchInsert(String sql, List<Object[]> paramsList) {
+        List<Integer> generatedIds = new ArrayList<>();
+
+        try (Connection conn = JDBCUtil.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+
+            conn.setAutoCommit(false); // 开启事务
+            for (Object[] params : paramsList) {
+                for (int i = 0; i < params.length; i++) {
+                    pstmt.setObject(i + 1, params[i]);
+                }
+                pstmt.addBatch();
+            }
+
+            pstmt.executeBatch();
+            conn.commit();
+
+            // 获取自增 ID
+            try (ResultSet rs = pstmt.getGeneratedKeys()) {
+                while (rs.next()) {
+                    generatedIds.add(rs.getInt(1));
+                }
+            }
+
+            System.out.println("批量插入成功，生成的 ID：" + generatedIds);
+        } catch (SQLException e) {
+            e.printStackTrace();
+            System.err.println("批量插入失败：" + e.getMessage());
+        }
+
+        return generatedIds;
+    }
     public <T> T baseQueryObject(Class<T> clazz, String sql, Object... args) {
         T t = null;
         Connection connection = JDBCUtil.getConnection();

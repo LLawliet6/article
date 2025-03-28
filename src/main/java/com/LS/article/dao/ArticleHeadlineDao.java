@@ -20,7 +20,7 @@ public interface ArticleHeadlineDao {
      *
      * @param attachments 附件对象列表
      */
-    void addAttachments(List<ArticleAttachment> attachments);
+   List<Integer> addAttachments(List<ArticleAttachment> attachments);
 
     /**
      * 根据类别ID查询文章列表
@@ -78,5 +78,8 @@ public interface ArticleHeadlineDao {
     List<HeadlinePageVo> getMyFavorites(Integer userId);
 
     int cancelFavorite(int hid);
+
+    // 添加单个附件
+ int addAttachment(ArticleAttachment attachment);
 }
 

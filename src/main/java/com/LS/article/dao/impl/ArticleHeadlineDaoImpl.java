@@ -7,7 +7,9 @@ import com.LS.article.pojo.ArticleHeadline;
 import com.LS.article.pojo.vo.HeadlineDetailVo;
 import com.LS.article.pojo.vo.HeadlinePageVo;
 import com.LS.article.pojo.vo.HeadlineQueryVo;
+import com.LS.article.util.JDBCUtil;
 
+import java.sql.*;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -74,14 +76,29 @@ public class ArticleHeadlineDaoImpl extends BaseDao implements ArticleHeadlineDa
         return  baseUpdate("DELETE FROM article_favorite WHERE hid = ?", hid);
     }
 
+    @Override
+    public int addAttachment(ArticleAttachment attachment) {
+        String sql = """
+        INSERT INTO article_attachment (hid, file_name, file_url, upload_time) 
+        VALUES (?, ?, ?, NOW())
+        """;
+
+        baseUpdate(sql, attachment.getHid(), attachment.getFileName(), attachment.getFileUrl());
+
+        // 查询最后插入的主键
+        String querySql = "SELECT LAST_INSERT_ID()";
+        return baseQueryObject(Integer.class, querySql);
+    }
+
 
     // 批量添加附件
     @Override
-    public void addAttachments(List<ArticleAttachment> attachments) {
+    public List<Integer> addAttachments(List<ArticleAttachment> attachments) {
         if (attachments == null || attachments.isEmpty()) {
             System.out.println("附件列表为空，跳过插入操作。");
-            return;
+            return new ArrayList<>();
         }
+
         String sql = "INSERT INTO article_attachment (hid, file_name, file_url, upload_time) VALUES (?, ?, ?, NOW())";
         List<Object[]> paramsList = new ArrayList<>();
 
@@ -94,14 +111,10 @@ public class ArticleHeadlineDaoImpl extends BaseDao implements ArticleHeadlineDa
             });
         }
 
-        try {
-            baseBatchUpdate(sql, paramsList);
-            System.out.println("附件批量插入成功！");
-        } catch (Exception e) {
-            System.err.println("附件插入失败：" + e.getMessage());
-            e.printStackTrace();
-        }
+        return baseBatchInsert(sql, paramsList);
     }
+
+
 
 
     @Override

@@ -11,9 +11,7 @@ import com.LS.article.util.WebUtil;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.MultipartConfig;
 import jakarta.servlet.annotation.WebServlet;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
-import jakarta.servlet.http.Part;
+import jakarta.servlet.http.*;
 
 
 import java.io.File;
@@ -25,13 +23,14 @@ import java.util.stream.Collectors;
 
 @MultipartConfig(
         location = "D:/javacode/LS_article/uploads", // 设置上传文件的临时目录
-        fileSizeThreshold = 1024 * 1024 * 2, // 2MB
+        fileSizeThreshold = 1024 * 1024 * 2*10, // 2MB
         maxFileSize = 1024 * 1024 * 50, // 50MB
         maxRequestSize = 1024 * 1024 * 100 // 100MB
 )
 @WebServlet("/headline/*")
 public class ArticleHeadlineController extends BaseController {
     private ArticleHeadlineService headlineService = new ArticleHeadlineServiceImpl();
+
     /**
      * 收藏文章实现
      */
@@ -60,6 +59,7 @@ public class ArticleHeadlineController extends BaseController {
         // 返回结果，前端根据此信息更新按钮状态
         WebUtil.writeJson(resp, Result.ok(resultMessage));
     }
+
     protected void favoriteStatus(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         Integer hid = Integer.parseInt(req.getParameter("hid"));
         String token = req.getHeader("token");
@@ -96,12 +96,12 @@ public class ArticleHeadlineController extends BaseController {
         // 返回结果
         WebUtil.writeJson(response, Result.ok(favoriteList));
     }
+
     protected void cancelFavorite(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         int hid = Integer.parseInt(req.getParameter("hid"));
         headlineService.cancelFavorite(hid);
         WebUtil.writeJson(resp, Result.ok(null));
     }
-
 
 
     /**
@@ -264,7 +264,12 @@ public class ArticleHeadlineController extends BaseController {
     protected void publish(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         String token = req.getHeader("token");
         Long userId = JwtHelper.getUserId(token);
-        // 文件上传路径
+        if (userId == null) {
+            WebUtil.writeJson(resp, Result.build(null, 401, "未检测到有效用户，请先登录"));
+            return;
+        }
+
+        // 文件上传路径（用于存储文章封面图片）
         String uploadDir = req.getServletContext().getRealPath("/uploads");
         System.out.println("文件上传目录：" + uploadDir);
         File uploadDirFile = new File(uploadDir);
@@ -278,25 +283,21 @@ public class ArticleHeadlineController extends BaseController {
             return;
         }
 
+        // 解析表单字段和图片文件（附件在前端已单独上传，不在此处理）
         Map<String, String> formFields = new HashMap<>();
         String imagePath = null;
-        List<String> attachmentPaths = new ArrayList<>();
 
         for (Part part : req.getParts()) {
             String name = part.getName();
             String fileName = part.getSubmittedFileName();
 
-            if (fileName != null && !fileName.isEmpty()) {
+            // 如果是文件且字段名称为 image，则处理图片上传
+            if (fileName != null && !fileName.isEmpty() && "image".equals(name)) {
                 String uniqueFileName = UUID.randomUUID() + "_" + fileName;
                 String filePath = "uploads/" + uniqueFileName;
                 part.write(uploadDir + File.separator + uniqueFileName);
-
-                if ("image".equals(name)) {
-                    imagePath = filePath;
-                } else if ("attachments".equals(name)) {
-                    attachmentPaths.add(filePath);
-                }
-            } else {
+                imagePath = filePath;
+            } else if (fileName == null || fileName.isEmpty()) { // 非文件字段
                 try (InputStream inputStream = part.getInputStream();
                      Scanner scanner = new Scanner(inputStream, "UTF-8")) {
                     scanner.useDelimiter("\\A");
@@ -304,10 +305,11 @@ public class ArticleHeadlineController extends BaseController {
                 }
             }
         }
+
         System.out.println("接收到的表单字段：" + formFields);
         System.out.println("接收到的图片路径：" + imagePath);
-        System.out.println("接收到的附件路径：" + attachmentPaths);
 
+        // 构建文章对象
         ArticleHeadline articleHeadline = new ArticleHeadline();
         articleHeadline.setTitle(formFields.get("title"));
         articleHeadline.setType(Integer.parseInt(formFields.get("type")));
@@ -315,26 +317,70 @@ public class ArticleHeadlineController extends BaseController {
         articleHeadline.setPublisher(userId.intValue());
         articleHeadline.setImageUrl(imagePath);
 
+        // 插入文章，获取生成的文章ID（hid）
         int hid = headlineService.addArticleHeadline(articleHeadline);
         System.out.println("文章插入成功，生成的文章 ID：" + hid);
 
-        if (!attachmentPaths.isEmpty()) {
-            List<ArticleAttachment> attachments = attachmentPaths.stream().map(path -> {
-                ArticleAttachment attachment = new ArticleAttachment();
-                attachment.setHid(hid);
-                attachment.setFileName(Paths.get(path).getFileName().toString());
-                attachment.setFileUrl(path);
-                return attachment;
-            }).collect(Collectors.toList());
-
-            System.out.println("准备保存的附件：" + attachments);
-            headlineService.uploadAttachments(attachments);
-            System.out.println("附件保存完成！");
+        // 从 session 中取出附件 ID 列表，并关联到文章
+        HttpSession session = req.getSession();
+        List<Integer> attachmentIds = (List<Integer>) session.getAttribute("attachmentIds");
+        if (attachmentIds != null && !attachmentIds.isEmpty()) {
+            headlineService.updateAttachmentsHid(hid, attachmentIds);
+            session.removeAttribute("attachmentIds"); // 关联完成后清除 session 中的附件ID
+            System.out.println("附件已关联到文章：" + attachmentIds);
         }
 
         WebUtil.writeJson(resp, Result.ok(null));
     }
 
+
+
+
+    protected void attachmentUploads(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        String uploadDir = req.getServletContext().getRealPath("/uploads");
+        File uploadDirFile = new File(uploadDir);
+        if (!uploadDirFile.exists()) uploadDirFile.mkdirs();
+
+        // 关键修改点：只处理单个文件
+        Part filePart = req.getPart("attachment");
+        // 关键修复：检查是否为 null
+        if (filePart == null) {
+            WebUtil.writeJson(resp, Result.build(null, 500, "未接收到文件"));
+            return;
+        }
+        String fileName = filePart.getSubmittedFileName();
+
+        if (fileName != null && !fileName.isEmpty()) {
+            // 生成唯一文件名
+            String uniqueFileName = UUID.randomUUID() + "_" + fileName;
+            String filePath = "uploads/" + uniqueFileName;
+
+            // 保存文件
+            filePart.write(uploadDir + File.separator + uniqueFileName);
+
+            // 创建附件对象
+            ArticleAttachment attachment = new ArticleAttachment();
+            attachment.setHid(null); // 临时值
+            attachment.setFileName(fileName);
+            attachment.setFileUrl(filePath);
+
+            // 插入数据库并获取生成的ID
+            int attachmentId = headlineService.uploadAttachment(attachment);
+
+            // 将ID存入Session（注意线程安全问题）
+            HttpSession session = req.getSession();
+            List<Integer> attachmentIds = (List<Integer>) session.getAttribute("attachmentIds");
+            if (attachmentIds == null) {
+                attachmentIds = new ArrayList<>();
+                session.setAttribute("attachmentIds", attachmentIds);
+            }
+            attachmentIds.add(attachmentId);
+
+            WebUtil.writeJson(resp, Result.ok(attachmentId));
+        } else {
+            WebUtil.writeJson(resp, Result.build(null, 666, "文件名为空"));
+        }
+    }
 
 
 }
