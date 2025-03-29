@@ -67,7 +67,7 @@ public class PortalController extends BaseController {
     }
 
     /**
-     * 附件
+     * 获取附件
      */
     protected void getAttachments(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         String hidParam = req.getParameter("hid");
@@ -82,6 +82,30 @@ public class PortalController extends BaseController {
             WebUtil.writeJson(resp, Result.ok(attachments));
         } catch (NumberFormatException e) {
             WebUtil.writeJson(resp, Result.build(null, 400, "文章ID格式错误"));
+        }
+    }
+    /**
+     * 删除附件
+     */
+    protected void deleteAttachment(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        String aidParam = req.getParameter("aid");
+        if (aidParam == null) {
+            WebUtil.writeJson(resp, Result.build(null, 400, "缺少附件ID"));
+            return;
+        }
+
+        try {
+            int aid = Integer.parseInt(aidParam);
+            // 调用服务层删除附件
+            boolean result = headlineService.deleteAttachmentById(aid);
+
+            if (result) {
+                WebUtil.writeJson(resp, Result.ok("附件删除成功"));
+            } else {
+                WebUtil.writeJson(resp, Result.build(null, 400, "附件删除失败"));
+            }
+        } catch (NumberFormatException e) {
+            WebUtil.writeJson(resp, Result.build(null, 400, "附件ID格式错误"));
         }
     }
 

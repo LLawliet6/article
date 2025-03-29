@@ -70,4 +70,6 @@ public interface ArticleHeadlineService {
 
     //上传单个附件
     int uploadAttachment(ArticleAttachment attachment);
+
+    boolean deleteAttachmentById(int aid);
 }

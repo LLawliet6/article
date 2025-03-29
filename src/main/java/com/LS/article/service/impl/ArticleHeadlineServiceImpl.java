@@ -10,6 +10,7 @@ import com.LS.article.pojo.vo.HeadlinePageVo;
 import com.LS.article.pojo.vo.HeadlineQueryVo;
 import com.LS.article.service.ArticleHeadlineService;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -120,7 +121,8 @@ public class ArticleHeadlineServiceImpl extends BaseDao implements ArticleHeadli
     public List<ArticleAttachment> getAttachmentsByHid(int hid) {
         return headlineDao.getAttachmentsByHid(hid);
     }
- //获取我的收藏
+
+    //获取我的收藏
     @Override
     public List<HeadlinePageVo> getMyFavorites(Integer userId) {
         return headlineDao.getMyFavorites(userId);
@@ -150,5 +152,63 @@ public class ArticleHeadlineServiceImpl extends BaseDao implements ArticleHeadli
         return headlineDao.addAttachment(attachment);
     }
 
-}
+    /**
+     * 删除附件
+     *
+     * @param aid 附件ID
+     * @return 删除结果
+     */
+    public boolean deleteAttachmentById(int aid) {
+        // 获取附件的文件路径
+        String filePath = getFilePathByAid(aid);
+        // 如果文件路径为空，说明文件不存在
+        if (filePath == null) {
+            System.out.println("文件路径无效，删除失败。");
+            return false;
+        }
+        // 删除数据库中的记录
+        String sqlDelete = "DELETE FROM article_attachment WHERE aid = ?";
+        int rowsAffected = baseUpdate(sqlDelete, aid);
+        if (rowsAffected > 0) {
+            // 文件删除操作
+            File file = new File(filePath);
+            if (file.exists()) {
+                boolean deleted = file.delete();
+                if (deleted) {
+                    System.out.println("文件删除成功：" + filePath);
+                    return true;
+                } else {
+                    System.out.println("文件删除失败：" + filePath);
+                }
+            } else {
+                System.out.println("文件不存在，删除失败：" + filePath);
+            }
+        } else {
+            System.out.println("数据库删除失败，附件ID：" + aid);
+        }
+        return false;
+    }
 
+    /**
+     * 根据附件id获取文件路径
+     *
+     * @param aid
+     * @return
+     */
+    private String getFilePathByAid(int aid) {
+        String sql = "SELECT aid AS aid, hid AS hid, file_name AS fileName, file_url AS fileUrl, upload_time AS uploadTime FROM article_attachment where aid = ?";
+        List<ArticleAttachment> attachmentList = baseQuery(ArticleAttachment.class, sql, aid);
+
+        // 检查附件列表是否为空，并取出第一个附件
+        if (attachmentList != null && !attachmentList.isEmpty()) {
+            ArticleAttachment attachment = attachmentList.get(0);  // 获取第一个附件
+
+            // 假设 file_url 存储的是相对路径，构建文件的绝对路径
+            String basePath = "D:/javadevelop/javacode/LS_article/target/LS_article/";
+            return basePath + attachment.getFileUrl();  // 组合出文件的绝对路径
+
+        }
+        return null;
+
+    }
+}
