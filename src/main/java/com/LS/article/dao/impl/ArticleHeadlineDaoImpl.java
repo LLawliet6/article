@@ -126,51 +126,44 @@ public class ArticleHeadlineDaoImpl extends BaseDao implements ArticleHeadlineDa
     @Override
     public List<HeadlinePageVo> findPageList(HeadlineQueryVo headlineQueryVo) {
         List<Object> params = new ArrayList<>();
-//        String sql = """
-//                select
-//                    hid,
-//                    title,
-//                    type,
-//                    page_views as pageViews,
-//                    TIMESTAMPDIFF(HOUR, create_time, now()) as pastHours,
-//                    publisher
-//                from
-//                    article_headline
-//                where
-//                    is_deleted = 0
-//                """;
         String sql = """
-                SELECT
-                    ah.hid,
-                    ah.title,
-                    ah.type,
-                    at.tname AS typeName,
-                    ah.page_views AS pageViews,
-                    TIMESTAMPDIFF(HOUR, ah.create_time, NOW()) AS pastHours,
-                    ah.publisher,
-                    au.username AS publisherName,
-                    ah.image_url AS imageUrl
-                FROM
-                    article_headline ah
-                JOIN
-                    article_user au ON ah.publisher = au.uid
-                JOIN
-                    article_type at ON ah.type = at.tid
-                WHERE
-                    ah.is_deleted = 0
-                """;
+            SELECT
+                ah.hid,
+                ah.title,
+                ah.type,
+                at.tname AS typeName,
+                ah.page_views AS pageViews,
+                TIMESTAMPDIFF(HOUR, ah.create_time, NOW()) AS pastHours,  -- 如果需要计算 pastHours，可在业务层处理
+                ah.publisher,
+                au.username AS publisherName,
+                ah.image_url AS imageUrl
+            FROM
+                article_headline ah
+            JOIN
+                article_user au ON ah.publisher = au.uid
+            JOIN
+                article_type at ON ah.type = at.tid
+            WHERE
+                ah.is_deleted = 0
+            """;
 
+        // 条件：按类型查询（当 type != 0 时表示有此条件）
         if (headlineQueryVo.getType() != 0) {
-            sql = sql.concat(" and type = ? ");
+            sql = sql.concat(" AND ah.type = ? ");
             params.add(headlineQueryVo.getType());
         }
-        if (headlineQueryVo.getKeyWords() != null && !headlineQueryVo.getKeyWords().equals("")) {
-            sql = sql.concat(" and title like ? ");
+        // 条件：标题模糊查询
+        if (headlineQueryVo.getKeyWords() != null && !headlineQueryVo.getKeyWords().trim().isEmpty()) {
+            sql = sql.concat(" AND ah.title LIKE ? ");
             params.add("%" + headlineQueryVo.getKeyWords() + "%");
         }
+        
 
-        sql = sql.concat(" order by pastHours ASC, page_views DESC ");
-        sql = sql.concat(" limit ?, ? ");
+        // 排序优化：使用创建时间倒序（最新的在前）及浏览量倒序
+        sql = sql.concat(" ORDER BY ah.create_time DESC, ah.page_views DESC ");
+
+        // 分页：使用 limit offset 分页
+        sql = sql.concat(" LIMIT ?, ? ");
         params.add((headlineQueryVo.getPageNum() - 1) * headlineQueryVo.getPageSize());
         params.add(headlineQueryVo.getPageSize());
 
@@ -181,22 +174,22 @@ public class ArticleHeadlineDaoImpl extends BaseDao implements ArticleHeadlineDa
     @Override
     public int findPageCount(HeadlineQueryVo headlineQueryVo) {
         List<Object> params = new ArrayList<>();
-
         String sql = """
-                select 
-                    count(1)
-                from 
-                    article_headline
-                where 
-                    is_deleted = 0
-                """;
+            SELECT 
+                COUNT(1)
+            FROM 
+                article_headline ah
+            WHERE 
+                ah.is_deleted = 0
+            """;
 
+        // 同样增加查询条件
         if (headlineQueryVo.getType() != 0) {
-            sql = sql.concat(" and type = ? ");
+            sql = sql.concat(" AND ah.type = ? ");
             params.add(headlineQueryVo.getType());
         }
-        if (headlineQueryVo.getKeyWords() != null && !headlineQueryVo.getKeyWords().equals("")) {
-            sql = sql.concat(" and title like ? ");
+        if (headlineQueryVo.getKeyWords() != null && !headlineQueryVo.getKeyWords().trim().isEmpty()) {
+            sql = sql.concat(" AND ah.title LIKE ? ");
             params.add("%" + headlineQueryVo.getKeyWords() + "%");
         }
 

@@ -8,6 +8,8 @@ import com.LS.article.service.ArticleHeadlineService;
 import com.LS.article.service.impl.ArticleHeadlineServiceImpl;
 import com.LS.article.util.JwtHelper;
 import com.LS.article.util.WebUtil;
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.MultipartConfig;
 import jakarta.servlet.annotation.WebServlet;
@@ -320,13 +322,16 @@ public class ArticleHeadlineController extends BaseController {
         // 插入文章，获取生成的文章ID（hid）
         int hid = headlineService.addArticleHeadline(articleHeadline);
         System.out.println("文章插入成功，生成的文章 ID：" + hid);
+        // 2. 获取附件ID数组（前端传的是 JSON 数组）
+        String attachmentIdsJson = req.getParameter("attachmentIds");
 
-        // 从 session 中取出附件 ID 列表，并关联到文章
-        HttpSession session = req.getSession();
-        List<Integer> attachmentIds = (List<Integer>) session.getAttribute("attachmentIds");
-        if (attachmentIds != null && !attachmentIds.isEmpty()) {
+        List<Integer> attachmentIds = new ArrayList<>();
+        if (attachmentIdsJson != null && !attachmentIdsJson.isEmpty()) {
+            attachmentIds = new Gson().fromJson(attachmentIdsJson, new TypeToken<List<Integer>>(){}.getType());
+        }
+        // 4. 关联附件ID到文章
+        if (!attachmentIds.isEmpty()) {
             headlineService.updateAttachmentsHid(hid, attachmentIds);
-            session.removeAttribute("attachmentIds"); // 关联完成后清除 session 中的附件ID
             System.out.println("附件已关联到文章：" + attachmentIds);
         }
 
@@ -366,15 +371,6 @@ public class ArticleHeadlineController extends BaseController {
 
             // 插入数据库并获取生成的ID
             int attachmentId = headlineService.uploadAttachment(attachment);
-
-            // 将ID存入Session（注意线程安全问题）
-            HttpSession session = req.getSession();
-            List<Integer> attachmentIds = (List<Integer>) session.getAttribute("attachmentIds");
-            if (attachmentIds == null) {
-                attachmentIds = new ArrayList<>();
-                session.setAttribute("attachmentIds", attachmentIds);
-            }
-            attachmentIds.add(attachmentId);
 
             WebUtil.writeJson(resp, Result.ok(attachmentId));
         } else {

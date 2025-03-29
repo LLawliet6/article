@@ -18,4 +18,5 @@ public class HeadlinePageVo implements Serializable {
     private String publisherName;
     private String typeName;
     private String imageUrl;
+
 }

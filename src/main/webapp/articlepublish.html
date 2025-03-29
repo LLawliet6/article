@@ -310,11 +310,14 @@
                             // 存储返回的附件ID
                             attachmentIds.push(response.data);
                             progressBar.style.backgroundColor = "#4CAF50"; // 绿色表示成功
+                            progressBar.textContent = " 上传成功 ✔"; // 成功提示
                         } else {
                             progressBar.style.backgroundColor = "#f44336"; // 红色表示失败
+                            progressBar.textContent = " 上传失败 ✖"; // 失败提示
                         }
                     }
                 };
+
 
                 xhr.onerror = function () {
                     progressBar.style.backgroundColor = "#f44336";
@@ -337,7 +340,7 @@
 
                 // 添加附件ID到表单数据
                 if (attachmentIds.length > 0) {
-                    formData.append("attachmentIds", attachmentIds.join(","));
+                    formData.append("attachmentIds", JSON.stringify(attachmentIds)); // 确保是 JSON 数组格式
                 }
                 console.log("发送的数据11:",formData);
                 // 发送请求
