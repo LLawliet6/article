@@ -4,6 +4,7 @@ import com.LS.article.dao.ArticleHeadlineDao;
 import com.LS.article.dao.BaseDao;
 import com.LS.article.pojo.ArticleAttachment;
 import com.LS.article.pojo.ArticleHeadline;
+import com.LS.article.pojo.vo.AttachmentVo;
 import com.LS.article.pojo.vo.HeadlineDetailVo;
 import com.LS.article.pojo.vo.HeadlinePageVo;
 import com.LS.article.pojo.vo.HeadlineQueryVo;
@@ -89,6 +90,29 @@ public class ArticleHeadlineDaoImpl extends BaseDao implements ArticleHeadlineDa
         String querySql = "SELECT LAST_INSERT_ID()";
         return baseQueryObject(Integer.class, querySql);
     }
+
+    public List<AttachmentVo> getMyAttachments(Integer userId) {
+        String sql = """
+            SELECT
+                aa.aid,
+                aa.hid,
+                ah.title AS articleTitle,
+                aa.file_name AS fileName,
+                aa.file_url AS fileUrl,
+                aa.upload_time AS uploadTime
+            FROM
+                article_attachment aa
+            JOIN
+                article_headline ah ON aa.hid = ah.hid
+            WHERE
+                ah.publisher = ? 
+            ORDER BY
+                aa.upload_time DESC
+            """;
+        return baseQuery(AttachmentVo.class, sql, userId);
+    }
+
+
 
 
     // 批量添加附件

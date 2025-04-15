@@ -2,6 +2,7 @@ package com.LS.article.dao;
 
 import com.LS.article.pojo.ArticleAttachment;
 import com.LS.article.pojo.ArticleHeadline;
+import com.LS.article.pojo.vo.AttachmentVo;
 import com.LS.article.pojo.vo.HeadlineDetailVo;
 import com.LS.article.pojo.vo.HeadlinePageVo;
 import com.LS.article.pojo.vo.HeadlineQueryVo;
@@ -81,5 +82,7 @@ public interface ArticleHeadlineDao {
 
     // 添加单个附件
  int addAttachment(ArticleAttachment attachment);
+
+ List<AttachmentVo> getMyAttachments(Integer userId);
 }
 

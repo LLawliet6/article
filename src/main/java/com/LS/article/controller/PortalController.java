@@ -4,12 +4,15 @@ import com.LS.article.common.Result;
 import com.LS.article.pojo.ArticleAttachment;
 import com.LS.article.pojo.ArticleHeadline;
 import com.LS.article.pojo.ArticleType;
+import com.LS.article.pojo.vo.AttachmentVo;
 import com.LS.article.pojo.vo.HeadlineDetailVo;
+import com.LS.article.pojo.vo.HeadlinePageVo;
 import com.LS.article.pojo.vo.HeadlineQueryVo;
 import com.LS.article.service.ArticleHeadlineService;
 import com.LS.article.service.ArticleTypeService;
 import com.LS.article.service.impl.ArticleHeadlineServiceImpl;
 import com.LS.article.service.impl.ArticleTypeServiceImpl;
+import com.LS.article.util.JwtHelper;
 import com.LS.article.util.WebUtil;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -26,6 +29,25 @@ import java.util.Map;
 public class PortalController extends BaseController {
     private ArticleTypeService typeService = new ArticleTypeServiceImpl();
     private ArticleHeadlineService headlineService = new ArticleHeadlineServiceImpl();
+
+    protected void myAttachments(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        // 获取当前登录用户
+        String token = request.getHeader("token");
+        Long userId = JwtHelper.getUserId(token);
+
+        if (userId == null) {
+            WebUtil.writeJson(response, Result.build(33, 333, "未登录"));
+            return;
+        }
+
+        // 查询用户的附件列表
+        List<AttachmentVo> attachmentList = headlineService.getMyAttachments(userId.intValue());
+
+        // 返回结果
+        WebUtil.writeJson(response, Result.ok(attachmentList));
+    }
+
+
 
     // 添加分类
     protected void addType(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {

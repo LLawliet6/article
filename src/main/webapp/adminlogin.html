@@ -1,179 +1,139 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>管理员登录注册</title>
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <meta charset="utf-8">
+    <title>登录注册</title>
+    <link rel="stylesheet" href="css/layui.css">
     <style>
-
-        * {
-            box-sizing: border-box;
+        body {
             margin: 0;
             padding: 0;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: url(images/adminbj.jpg) no-repeat center center fixed;
+            background-size: cover;
         }
 
-        body {
-            background-image: url('./images/aminlogin.jpg'); /* 设置背景图片 */
-            background-size: cover; /* 确保图片覆盖整个页面 */
-            background-position: center; /* 背景居中 */
-            background-color: #f0f2f5;
-            font-family: Arial, sans-serif;
+        .container {
+            width: 360px;
+            transition: all 0.3s;
         }
 
-        .login-container {
-            width: 300px;
-            margin: 100px auto;
-            padding: 20px;
-            background: white;
-            border-radius: 8px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        .form-box {
+            background: rgba(255, 255, 255, 0.4);
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+            position: relative;
         }
 
-        h2 {
+        .form-title {
             text-align: center;
+            font-size: 24px;
             color: #333;
+            margin-bottom: 30px;
+            letter-spacing: 2px;
+        }
+
+        .layui-form-item {
             margin-bottom: 20px;
         }
 
-        label {
-            margin-bottom: 5px;
-            display: block;
-            color: #555;
-        }
-
-        input[type="text"], input[type="password"] {
-            width: 100%;
-            padding: 10px;
-            margin-bottom: 15px;
-            border: 1px solid #ccc;
+        .layui-input {
             border-radius: 4px;
-            font-size: 14px;
         }
 
-        input[type="text"]:focus, input[type="password"]:focus {
-            border-color: #007bff;
-            outline: none;
-            box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
-        }
-
-        button {
-            width: 100%;
-            padding: 10px;
-            background-color: #007bff;
-            border: none;
-            border-radius: 4px;
-            color: white;
-            font-size: 16px;
-            cursor: pointer;
-            transition: background-color 0.3s;
-        }
-
-        button:hover {
-            background-color: #0056b3;
-        }
-
-        #error-message {
-            color: red;
-            display: none;
+        .switch-text {
             text-align: center;
+            margin-top: 20px;
+        }
+
+        .switch-text a {
+            color: #1E9FFF;
+            cursor: pointer;
+        }
+
+        .layui-form-checkbox[lay-skin="primary"] {
             margin-top: 10px;
         }
     </style>
-
 </head>
 <body>
 
-<div class="login-container">
-    <h2>管理员登录</h2>
-    <label for="login-username">用户名：</label>
-    <input type="text" id="login-username" placeholder="请输入用户名"><br>
-    <label for="login-password">密码：</label>
-    <input type="password" id="login-password" placeholder="请输入密码"><br>
-    <button id="login-btn">登录</button>
-    <p id="error-message"></p>
+<div class="container">
+    <!-- 登录表单 -->
+    <div class="form-box" id="login-box">
+        <h2 class="form-title">欢迎登录</h2>
+        <form class="layui-form">
+            <div class="layui-form-item">
+                <input type="text" name="username" lay-verify="required" placeholder="用户名" class="layui-input">
+            </div>
+            <div class="layui-form-item">
+                <input type="password" name="password" lay-verify="required" placeholder="密码" class="layui-input">
+            </div>
+            <div class="layui-form-item">
+                <button class="layui-btn layui-btn-fluid" lay-submit lay-filter="login">立即登录</button>
+            </div>
+            <div class="switch-text">没有账号？<a onclick="switchForm('register')">立即注册</a></div>
+        </form>
+    </div>
+
+    <!-- 注册表单 -->
+    <div class="form-box" id="register-box" style="display: none;">
+        <h2 class="form-title">用户注册</h2>
+        <form class="layui-form">
+            <div class="layui-form-item">
+                <input type="text" name="username" lay-verify="required" placeholder="用户名" class="layui-input">
+            </div>
+            <div class="layui-form-item">
+                <input type="password" name="password" lay-verify="required" placeholder="密码" class="layui-input">
+            </div>
+            <div class="layui-form-item">
+                <input type="password" name="repassword" lay-verify="required" placeholder="确认密码" class="layui-input">
+            </div>
+            <div class="layui-form-item">
+                <button class="layui-btn layui-btn-fluid" lay-submit lay-filter="register">立即注册</button>
+            </div>
+            <div class="switch-text">已有账号？<a onclick="switchForm('login')">立即登录</a></div>
+        </form>
+    </div>
 </div>
 
-
-<!--<hr>-->
-<!--<div>-->
-<!--    <h2>管理员注册</h2>-->
-<!--    <label for="register-username">用户名：</label>-->
-<!--    <input type="text" id="register-username"><br>-->
-<!--    <label for="register-password">密码：</label>-->
-<!--    <input type="password" id="register-password"><br>-->
-<!--    <button id="register-btn">注册</button>-->
-<!--</div>-->
-
+<script src="js/layui.js"></script>
 <script>
-    $(document).ready(function () {
-        // 注册管理员
-        $('#register-btn').click(function () {
-            const username = $('#register-username').val();
-            const password = $('#register-password').val(); // 修改这里，前端字段名为 password
-            const url = '/admin/register'; // 管理员注册的 URL
-            const adminData = {username, password}; // 发送的 JSON 数据字段名为 password
+    // 初始化Layui模块
+    layui.use(['form', 'layer'], function(){
+        var form = layui.form;
+        var layer = layui.layer;
 
-            $.ajax({
-                url: url,
-                type: 'POST',
-                contentType: 'application/json',
-                data: JSON.stringify(adminData), // 发送 JSON 数据
-                success: function (response) {
-                    if (response.code === 200) {
-                        alert('管理员注册成功！');
-                    } else {
-                        alert('注册失败：' + response.message);
-                    }
-                },
-                error: function () {
-                    alert('注册请求失败');
-                }
-            });
+        // 登录提交
+        form.on('submit(login)', function(data){
+            // 这里写登录逻辑
+            layer.msg('登录提交', {icon: 1});
+            return false;
         });
 
-
-        // 登录管理员
-        $('#login-btn').click(function () {
-            const username = $('#login-username').val();
-            const password = $('#login-password').val();
-
-            if (!username || !password) {
-                alert('请输入完整的用户名和密码！');
-                return;
-            }
-
-            const adminLoginData = {
-                username: username,
-                password: password
-            };
-
-            $.ajax({
-                url: '/admin/login', // 确保后台有专门的管理员登录接口
-                type: 'POST',
-                contentType: 'application/json',
-                data: JSON.stringify(adminLoginData),
-                success: function (response) {
-                    if (response.code === 200) {
-                        alert('登录成功！');
-                        localStorage.setItem('adminToken', response.data.token); // 存储管理员 token
-                        localStorage.setItem('adminUsername', username); // 存储管理员用户名
-                        window.location.href = 'admin.html'; // 跳转到管理员后台页面
-                    } else {
-                        $('#error-message').text('用户名或密码错误').show();
-                    }
-                },
-                error: function () {
-                    alert('登录请求失败');
-                }
-            });
-        });
-
-        // 当密码框获得焦点时清空输入并隐藏错误信息
-        $('#login-password').focus(function () {
-            $('#error-message').hide();
+        // 注册提交
+        form.on('submit(register)', function(data){
+            // 这里写注册逻辑
+            layer.msg('注册提交', {icon: 1});
+            return false;
         });
     });
+
+    // 切换表单函数
+    function switchForm(type) {
+        if(type === 'login') {
+            document.getElementById('login-box').style.display = 'block';
+            document.getElementById('register-box').style.display = 'none';
+        } else {
+            document.getElementById('login-box').style.display = 'none';
+            document.getElementById('register-box').style.display = 'block';
+        }
+    }
 </script>
+
 </body>
 </html>

@@ -44,6 +44,12 @@
                     <div class="password input-item">
                         <input type="password" class="ipts" id="login-password">
                     </div>
+                    <div class="role-selection input-item" style="height: 20px">
+                        <select id="login-role">
+                            <option value="0">客户端</option>
+                            <option value="1">后台管理</option>
+                        </select>
+                    </div>
                     <div class="remember-me">
                         <label>
                             <input type="checkbox" id="remember-me"> 记住我
@@ -158,19 +164,74 @@
 
 
 //登录
+//     $(document).ready(function() {
+//         $("#login-btn").click(function() {
+//             // 获取用户名和密码
+//             const username = $("#login-username").val();
+//             const password = $("#login-password").val();
+//
+//             // 创建请求体
+//             const requestBody = {
+//                 username: username,
+//                 userPwd: password
+//             };
+//
+//             // 发送 AJAX 请求
+//             $.ajax({
+//                 url: '/user/login',
+//                 type: 'POST',
+//                 contentType: 'application/json',
+//                 data: JSON.stringify(requestBody),
+//                 success: function(data) {
+//                     if (data.code === 200) {
+//                         const rememberMe = $("#remember-me").prop("checked");
+//                         const token = data.data.token;
+//
+//                         if (rememberMe) {
+//                             // 持久化存储
+//                             localStorage.setItem("username", username);
+//                             localStorage.setItem("token", token);
+//                             sessionStorage.removeItem("username");  // 清除会话存储
+//                             sessionStorage.removeItem("token");
+//                         } else {
+//                             // 会话存储
+//                             sessionStorage.setItem("username", username);
+//                             sessionStorage.setItem("token", token);
+//                             localStorage.removeItem("username");  // 清除持久化存储
+//                             localStorage.removeItem("token");
+//                         }
+//                         alert("登录成功!");
+//                         window.location.href = 'index.html';
+//                     } else {
+//                         $('#error-message').text("用户名或密码错误.").show();
+//                     }
+//                 },
+//                 error: function(xhr, status, error) {
+//                     console.error('Error:', error);
+//                     alert("请求失败.");
+//                 }
+//             });
+//         });
+//         // 当密码输入框获取焦点时清空输入并隐藏错误信息
+//         $('#login-password').focus(function() {
+//             $(this).val(''); // 清空密码输入框
+//             $('#error-message').hide(); // 隐藏错误信息
+//         });
+//     });
+
     $(document).ready(function() {
+        let hasRedirected = false; // 跳转标志位
+
         $("#login-btn").click(function() {
-            // 获取用户名和密码
             const username = $("#login-username").val();
             const password = $("#login-password").val();
+            const selectedRole = $("#login-role").val(); // 新增：获取下拉框选择值
 
-            // 创建请求体
             const requestBody = {
                 username: username,
                 userPwd: password
             };
 
-            // 发送 AJAX 请求
             $.ajax({
                 url: '/user/login',
                 type: 'POST',
@@ -181,44 +242,78 @@
                         const rememberMe = $("#remember-me").prop("checked");
                         const token = data.data.token;
 
-                        if (rememberMe) {
-                            // 持久化存储
-                            localStorage.setItem("username", username);
-                            localStorage.setItem("token", token);
-                            sessionStorage.removeItem("username");  // 清除会话存储
-                            sessionStorage.removeItem("token");
-                        } else {
-                            // 会话存储
-                            sessionStorage.setItem("username", username);
-                            sessionStorage.setItem("token", token);
-                            localStorage.removeItem("username");  // 清除持久化存储
-                            localStorage.removeItem("token");
-                        }
-                        alert("登录成功!");
-                        window.location.href = 'index.html';
+                        // 存储 token 和用户名
+                        const storage = rememberMe ? localStorage : sessionStorage;
+                        storage.setItem("token", token);
+                        storage.setItem("username", username);
+
+                        // 清除另一种存储
+                        const otherStorage = rememberMe ? sessionStorage : localStorage;
+                        otherStorage.removeItem("token");
+                        otherStorage.removeItem("username");
+
+                        getUserInfo(token, selectedRole); // 传入选择的角色
                     } else {
-                        $('#error-message').text("用户名或密码错误.").show();
+                        $('#error-message').text("用户名或密码错误").show();
                     }
                 },
-                error: function(xhr, status, error) {
-                    console.error('Error:', error);
-                    alert("请求失败.");
+                error: function(xhr) {
+                    $('#error-message').text(`登录失败: ${xhr.responseJSON?.message || ''}`).show();
                 }
             });
         });
-        // 当密码输入框获取焦点时清空输入并隐藏错误信息
+
+
+// 获取用户信息函数改造
+        function getUserInfo(token, selectedRole) {
+            $.ajax({
+                url: '/user/getUserInfo',
+                type: 'GET',
+                headers: { "token": token },
+                success: function(userData) {
+                    if (userData.code === 200) {
+                        const userRole = userData.data.loginUser.role; // 数据库中角色
+                        const storage = localStorage.getItem("token") ? localStorage : sessionStorage;
+                        storage.setItem("role", userRole);
+
+                        let redirectUrl = 'index.html';
+
+                        // 根据用户选择决定跳转页面，不再检查权限
+                        if (selectedRole === '1') {
+                            redirectUrl = 'adminManage.html'; // 用户选择进入管理端
+                        } else {
+                            redirectUrl = 'index.html'; // 用户选择进入客户端
+                        }
+
+                        if (!hasRedirected) {
+                            hasRedirected = true;
+                            alert("登录成功!");
+                            setTimeout(() => {
+                                window.location.href = redirectUrl;
+                            }, 500);
+                        }
+
+                    } else {
+                        alert("用户信息获取失败");
+                    }
+                },
+                error: function() {
+                    alert("用户信息请求失败");
+                    if (!hasRedirected) {
+                        window.location.href = 'index.html';
+                    }
+                }
+            });
+        }
+
+
+
+        // 保留密码框清空逻辑
         $('#login-password').focus(function() {
-            $(this).val(''); // 清空密码输入框
-            $('#error-message').hide(); // 隐藏错误信息
+            $(this).val('');
+            $('#error-message').hide();
         });
     });
-
-
-
-
-
-
-
 
 
 

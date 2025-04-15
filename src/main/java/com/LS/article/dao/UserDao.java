@@ -18,5 +18,7 @@ public interface UserDao {
     Integer deleteUser(Integer userId);
 
     List<User> findAll();
+
+    Integer getRoleIdByUserId(int userId);
 }
 

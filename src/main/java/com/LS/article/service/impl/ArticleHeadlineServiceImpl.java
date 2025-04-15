@@ -5,6 +5,7 @@ import com.LS.article.dao.BaseDao;
 import com.LS.article.dao.impl.ArticleHeadlineDaoImpl;
 import com.LS.article.pojo.ArticleAttachment;
 import com.LS.article.pojo.ArticleHeadline;
+import com.LS.article.pojo.vo.AttachmentVo;
 import com.LS.article.pojo.vo.HeadlineDetailVo;
 import com.LS.article.pojo.vo.HeadlinePageVo;
 import com.LS.article.pojo.vo.HeadlineQueryVo;
@@ -188,6 +189,12 @@ public class ArticleHeadlineServiceImpl extends BaseDao implements ArticleHeadli
         }
         return false;
     }
+
+   // 获取我的附件列表
+   public List<AttachmentVo> getMyAttachments(Integer userId) {
+       return headlineDao.getMyAttachments(userId);
+   }
+
 
     /**
      * 根据附件id获取文件路径

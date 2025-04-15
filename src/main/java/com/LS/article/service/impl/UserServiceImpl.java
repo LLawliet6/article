@@ -17,7 +17,9 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public User findByUid(Integer userId) {
-        return userDao.findByUid(userId);
+        User user = userDao.findByUid(userId);
+        user.setUserPwd("");
+        return user;
     }
 
     @Override

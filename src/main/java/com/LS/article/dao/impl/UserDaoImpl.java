@@ -72,5 +72,12 @@ public class UserDaoImpl extends BaseDao implements UserDao {
                 """;
         return  baseQuery(User.class, sql);
     }
+
+
+    // 获取用户角色id
+    public Integer getRoleIdByUserId(int userId) {
+        String sql = "SELECT role FROM article_user WHERE uid = ?";
+        return baseQueryObject(Integer.class, sql, userId);
+    }
 }
 
