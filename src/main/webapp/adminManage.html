@@ -6,27 +6,19 @@
   <title>后台管理模板</title>
   <link rel="stylesheet" href="css/layui.css">
   <link rel="stylesheet" href="css/font_awsome.css">
-<!--  <script src="js/axios.min.js"></script>-->
   <script src="js/jquery3.5.1.js"></script>
+  <style>
+    .layui-body {
+      padding: 0;
+    }
+    iframe {
+      width: 100%;
+      height: 100%;
+      border: none;
+    }
+  </style>
 </head>
-<script>
-  $(document).ready(function () {
-    // 监听侧边栏菜单的点击事件
-    $('.layui-nav-tree a[data-url]').on('click', function (e) {
-      e.preventDefault(); // 阻止默认跳转行为
 
-      var url = $(this).attr('data-url'); // 获取目标页面的 URL
-      var $layuiBody = $('.layui-body');
-
-      // 显示加载动画
-      $layuiBody.html('<div class="layui-loading">加载中...</div>');
-
-      // 通过 AJAX 加载目标页面
-      $layuiBody.load(url);
-    });
-  });
-
-</script>
 <body class="layui-layout-body">
 <div class="layui-layout layui-layout-admin">
   <!-- 顶部导航栏 -->
@@ -41,49 +33,28 @@
           <span>管理员</span>
         </a>
         <dl class="layui-nav-child">
-          <dd><a href="">基本资料</a></dd>
-          <dd><a href="">安全设置</a></dd>
+          <dd><a href="#">基本资料</a></dd>
+          <dd><a href="#">安全设置</a></dd>
         </dl>
       </li>
-      <li class="layui-nav-item"><a href="#" onclick="logout(); return false;">退出</a>
-
-      </li>
+      <li class="layui-nav-item"><a href="#" onclick="logout(); return false;">退出</a></li>
     </ul>
   </div>
 
   <!-- 侧边栏 -->
   <div class="layui-side layui-bg-black">
     <div class="layui-side-scroll">
-      <ul class="layui-nav layui-nav-tree" lay-filter="test">
-        <li class="layui-nav-item layui-nav-itemed">
-          <a href="javascript:;">
-            <i class="layui-icon layui-icon-set"></i> 系统管理 <!-- Layui 图标 -->
-          </a>
-          <dl class="layui-nav-child">
-            <dd><a href="javascript:;"data-url="user-manage.html"><i class="layui-icon layui-icon-user"></i> 用户管理</a></dd>
-            <dd><a href="javascript:;"><i class="layui-icon layui-icon-group"></i> 角色管理</a></dd>
-            <dd><a href="javascript:;"><i class="layui-icon layui-icon-auz"></i> 权限管理</a></dd>
-          </dl>
-        </li>
-        <li class="layui-nav-item">
-          <a href="javascript:;">
-            <i class="layui-icon layui-icon-template"></i> 内容管理 <!-- Layui 图标 -->
-          </a>
-          <dl class="layui-nav-child">
-            <dd><a href="javascript:;"data-url="article-manage.html"><i class="layui-icon layui-icon-form"></i> 文章管理</a></dd>
-            <dd><a href="javascript:;" data-url="category-management.html"><i class="layui-icon layui-icon-note"></i> 分类管理</a></dd>
-            <dd><a href="javascript:;"data-url="comment-manage.html"><i class="layui-icon layui-icon-dialogue"></i> 评论管理</a></dd>
-          </dl>
-        </li>
+      <ul id="menu-container" class="layui-nav layui-nav-tree" lay-filter="test">
+        <!-- 动态菜单填充区域 -->
       </ul>
     </div>
   </div>
 
   <!-- 内容区域 -->
   <div class="layui-body">
-    <div style="padding: 15px;">
-      <h1>欢迎使用后台管理系统</h1>
-      <p>这里是内容区域，你可以在这里添加你的页面内容。</p>
+    <div id="main-content" style="width: 100%; height: 100%;">
+      <!-- 默认加载欢迎页面，可以换成 iframe -->
+      <iframe src="user-manage.html" id="content-frame"></iframe>
     </div>
   </div>
 
@@ -93,18 +64,28 @@
   </div>
 </div>
 
+<!-- 公共 JS -->
 <script src="js/layui.js"></script>
+<script src="js/admin_login.js"></script>
+<script src="js/dynamic_menu.js"></script>
+
 <script>
   layui.use(['element', 'layer'], function(){
     var element = layui.element;
     var layer = layui.layer;
   });
+
+  // 示例：点击菜单项切换 iframe 页面
+  $(function () {
+    $('#menu-container').on('click', 'a', function () {
+      const url = $(this).data('url');
+      if (url) {
+        $('#content-frame').attr('src', url);
+      }
+    });
+  });
+
 </script>
-<!--<script src="js/article_manage.js"></script>-->
-<script src="js/admin_login.js"></script>
-<script src="js/user_manage.js"></script>
-<script src="js/category_manage.js"></script>
-<script src="js/comment_manage.js"></script>
 
 </body>
 </html>

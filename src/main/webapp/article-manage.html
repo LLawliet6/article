@@ -1,22 +1,26 @@
-<!-- article-manage.html -->
-<script src="js/article_manage.js"></script>
-<script src="js/ckeditor.js"></script>
-<script src="js/layui.js"></script>
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>文章管理</title>
+    <link rel="stylesheet" href="css/layui.css">
+    <link rel="stylesheet" href="css/font_awsome.css">
+    <script src="js/jquery3.5.1.js"></script>
+    <script src="js/layui.js"></script>
+    <script src="js/ckeditor.js"></script>
+</head>
+<body>
 <div style="padding: 30px;">
     <h1 style="display: inline-block;">文章管理</h1>
 
     <!-- 筛选区域 -->
     <div class="layui-form" style="margin-bottom: 20px; display: flex; align-items: center; gap: 10px;">
-        <!-- 分类下拉框（动态加载） -->
         <select id="category-select" lay-filter="category">
             <option value="">请选择分类</option>
         </select>
-        <!-- 关键字输入框 -->
         <input type="text" id="search-input" placeholder="请输入关键字" class="layui-input" style="width: 200px;">
-        <!-- 搜索按钮 -->
         <button id="search-btn" class="layui-btn layui-btn-normal">搜索</button>
     </div>
-
 
     <!-- 文章列表区域 -->
     <table class="layui-table" id="userTable">
@@ -38,6 +42,7 @@
     <ul id="pagination" class="pagination" style="list-style: none; padding: 0; display: flex;"></ul>
 </div>
 
-
-
-
+<!-- 注意：JS 放在最下面，确保 DOM 都加载完了 -->
+<script src="js/article_manage.js"></script>
+</body>
+</html>
