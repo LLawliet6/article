@@ -18,7 +18,7 @@ public class AiController extends BaseController {
     private final AiServiceImpl aiService = new AiServiceImpl();
     private final ObjectMapper mapper = new ObjectMapper();
     // POST /api/ai/chat
-    protected void askSome(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+    protected void chat(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         // 读取前端 JSON：{ "message":"你好 AI" }
         JsonNode reqJson = mapper.readTree(req.getInputStream());
         String userMsg = reqJson.path("message").asText("");

@@ -8,11 +8,16 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import okhttp3.*;
 
+import java.util.concurrent.TimeUnit;
 
 
-public class AiServiceImpl {
+public class AiServiceImpl implements AiService{
 
-    private final OkHttpClient client = new OkHttpClient();
+    private final  OkHttpClient client = new OkHttpClient.Builder()
+            .connectTimeout(30, TimeUnit.SECONDS)   // 连接超时
+            .writeTimeout(30, TimeUnit.SECONDS)     // 写请求体超时
+            .readTimeout(120, TimeUnit.SECONDS)     // 读取响应超时
+            .build();
     private final ObjectMapper mapper = new ObjectMapper();
     private final String apiUrl = AiConfig.get("silicon-flow.api.url");
     private final String apiKey = AiConfig.get("silicon-flow.api.key");

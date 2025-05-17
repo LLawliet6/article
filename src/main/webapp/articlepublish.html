@@ -3,13 +3,15 @@
 <head>
     <!-- Required meta tags -->
     <meta charset="utf-8">
-    <meta http-equiv="Cache-Control" content="no-store" />
+    <meta http-equiv="Cache-Control" content="no-store"/>
     <title>Clickaholic</title>
     <!-- Bootstrap CSS -->
-    <link rel="stylesheet" href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
-<!--    文本编辑器-->
+    <link rel="stylesheet" href="/css/bootstrap.min.css">
+    <!--    文本编辑器-->
     <link href="https://cdn.quilljs.com/1.3.7/quill.snow.css" rel="stylesheet">
+    <link rel="stylesheet" href="css/layui.css">
     <script src="https://cdn.quilljs.com/1.3.7/quill.min.js"></script>
+    <script src="js/layui.js"></script>
     <script src="js/jquery3.5.1.js"></script>
     <script src="js/bootstrap.min.js"></script>
 
@@ -20,6 +22,25 @@
     </script>
     <link rel="stylesheet" href="css/main.css">
     <style>
+        #aiChatBtn {
+            position: fixed;
+            right: 30px;
+            bottom: 30px;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background-color: #009688;
+            color: #fff;
+            font-size: 30px;
+            line-height: 60px;
+            text-align: center;
+            cursor: pointer;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+            z-index: 1000;
+        }
+
+
+
         #editor-container {
             height: 300px;
             border: 1px solid #ced4da;
@@ -27,6 +48,7 @@
             padding: 10px;
             background-color: white;
         }
+
         /* 进度条样式 */
         .file-progress {
             margin: 8px 0;
@@ -59,7 +81,8 @@
         <a class="navbar-brand" href="index.html">
             <img src="images/nav-logo.png" alt="nav-logo">
         </a>
-        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent-4" aria-controls="navbarSupportedContent-4" aria-expanded="false" aria-label="Toggle navigation">
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent-4"
+                aria-controls="navbarSupportedContent-4" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
         </button>
         <div class="collapse navbar-collapse" id="navbarSupportedContent-4">
@@ -80,7 +103,8 @@
                     <a class="nav-link" href="articlemanage.html">我的文章 </a>
                 </li>
                 <li class="nav-item dropdown" id="username-display" style="display: none;">
-                    <a class="nav-link dropdown-toggle" href="#" id="logged-username" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></a>
+                    <a class="nav-link dropdown-toggle" href="#" id="logged-username" data-toggle="dropdown"
+                       aria-haspopup="true" aria-expanded="false"></a>
                     <div class="dropdown-menu" aria-labelledby="logged-username">
                         <a class="dropdown-item" href="myfavorite.html">我的收藏</a>
                         <a class="dropdown-item" href="settings.html">设置</a>
@@ -98,7 +122,7 @@
 </nav>
 
 
-    <!-- 文章发布-->
+<!-- 文章发布-->
 <section class="gallery-page">
     <div class="container">
         <h2>文章发布</h2>
@@ -107,7 +131,8 @@
                 <form id="publishForm" enctype="multipart/form-data">
                     <div class="form-group">
                         <label for="title">标题</label>
-                        <input type="text" class="form-control" id="title" name="title" placeholder="请输入文章标题" required>
+                        <input type="text" class="form-control" id="title" name="title" placeholder="请输入文章标题"
+                               required>
                     </div>
                     <div class="form-group">
                         <label for="type">类别</label>
@@ -122,7 +147,8 @@
                     </div>
                     <div class="form-group">
                         <label for="image">上传图片</label>
-                        <input type="file" class="form-control" id="image" name="image" accept="image/*" style="width: 230px;">
+                        <input type="file" class="form-control" id="image" name="image" accept="image/*"
+                               style="width: 230px;">
                     </div>
                     <div class="form-group">
                         <label for="attachments">上传附件</label>
@@ -130,19 +156,18 @@
                         <input type="file" class="form-control" id="attachments" name="attachments" multiple>
                         <div id="progressContainer"></div>
                     </div>
-
-                    <button type="button" id="publishButton" style="background-color: black; color: yellow;">发布</button>
+                    <button type="button" id="publishButton" style="background-color: black; color: yellow;">发布
+                    </button>
                 </form>
-
+                <div id="aiChatBtn" title="AI 聊天">🤖</div>
             </div>
         </div>
     </div>
 </section>
 
 
-
-    <!--/.Portfolio-Section -->
-    <!-- Footer -->
+<!--/.Portfolio-Section -->
+<!-- Footer -->
 <footer>
 
     <section class="footer-bottom">
@@ -170,205 +195,206 @@
         </div>
     </section>
 </footer>
-    <!-- /.Footer -->
-   <script src="js/auth.js"></script>
-    <script>
+<!-- /.Footer -->
+<script src="js/auth.js"></script>
+<script src="js/Ai.js"></script>
+<script src="js/marked.js"></script>
+<script>
 
-        // 初始化 Quill 编辑器
-        const quill = new Quill('#editor-container', {
-            theme: 'snow', // 使用 "snow" 主题
-            placeholder: '在这里编辑文章内容...',
-            modules: {
-                toolbar: [
-                    ['bold', 'italic', 'underline'], // 样式
-                    [{ 'list': 'ordered' }, { 'list': 'bullet' }], // 列表
-                    ['link', 'image'] // 链接和图片
-                ]
-            }
+    // 初始化 Quill 编辑器
+    const quill = new Quill('#editor-container', {
+        theme: 'snow', // 使用 "snow" 主题
+        placeholder: '在这里编辑文章内容...',
+        modules: {
+            toolbar: [
+                ['bold', 'italic', 'underline'], // 样式
+                [{'list': 'ordered'}, {'list': 'bullet'}], // 列表
+                ['link', 'image'] // 链接和图片
+            ]
+        }
+    });
+    // 动态加载文章类别
+    document.addEventListener("DOMContentLoaded", function () {
+        fetch("/portal/findAllTypes")
+            .then(response => response.json())
+            .then(data => {
+                if (data.code === 200) {
+                    const typeSelect = document.getElementById("type");
+                    data.data.forEach(type => {
+                        const option = document.createElement("option");
+                        option.value = type.tid; // 根据后端返回数据结构选择正确的属性
+                        option.textContent = type.tname;
+                        typeSelect.appendChild(option);
+                    });
+                } else {
+                    alert("无法加载类别列表，请稍后再试！");
+                }
+            })
+            .catch(error => {
+                console.error("Error:", error);
+                alert("请求失败，请稍后再试！");
+            });
+    });
+
+    // 文章发布请求
+    // document.getElementById("publishButton").addEventListener("click", function () {
+    //     const title = document.getElementById("title").value;
+    //     const type = document.getElementById("type").value;
+    //     const content = quill.root.innerHTML; // 获取富文本编辑器的 HTML 内容
+    //     const image = document.getElementById("image").files[0];
+    //
+    //     const token = localStorage.getItem("token");
+    //     if (!token) {
+    //         alert("未检测到登录信息，请先登录！");
+    //         return;
+    //     }
+    //
+    //     // 使用 FormData 处理多部分表单数据
+    //     const formData = new FormData();
+    //     formData.append("title", title);
+    //     formData.append("type", type);
+    //     formData.append("article", content); // 提交 HTML 格式内容
+    //     if (image) {
+    //         formData.append("image", image); // 添加图片文件
+    //     }
+    //
+    //     fetch("/headline/publish", {
+    //         method: "POST",
+    //         headers: {
+    //             "token": token // 将 token 放入请求头
+    //         },
+    //         body: formData // 直接传递 FormData 对象
+    //     })
+    //         .then(response => response.json())
+    //         .then(data => {
+    //             if (data.code === 200) {
+    //                 alert("文章发布成功！");
+    //                 document.getElementById("publishForm").reset();
+    //                 quill.setContents([]); // 清空富文本编辑器内容
+    //             } else {
+    //                 alert("文章发布失败：" + data.msg);
+    //             }
+    //         })
+    //         .catch(error => {
+    //             console.error("Error:", error);
+    //             alert("请求失败，请稍后再试！");
+    //         });
+    // });
+
+    document.addEventListener("DOMContentLoaded", function () {
+        const publishButton = document.getElementById("publishButton");
+        const attachmentsInput = document.getElementById("attachments");
+        const progressContainer = document.getElementById("progressContainer");
+        let attachmentIds = []; // 存储所有已上传附件的ID
+
+        // 监听文件选择事件：用户选择文件后立即开始上传
+        attachmentsInput.addEventListener("change", function (e) {
+            const files = e.target.files;
+            if (files.length === 0) return;
+
+            // 清空旧数据和进度条
+            attachmentIds = [];
+            progressContainer.innerHTML = "";
+
+            // 逐个上传文件
+            Array.from(files).forEach(file => {
+                uploadFile(file);
+            });
         });
-        // 动态加载文章类别
-        document.addEventListener("DOMContentLoaded", function() {
-            fetch("/portal/findAllTypes")
-                .then(response => response.json())
+
+        // 单个文件上传函数
+        function uploadFile(file) {
+            const formData = new FormData();
+            formData.append("attachment", file); // 参数名必须与后端一致
+            console.log("Uploading file:", file.name, file.size);
+
+            // 创建独立的进度条元素
+            const progressDiv = document.createElement("div");
+            progressDiv.className = "file-progress";
+            const fileNameSpan = document.createElement("span");
+            fileNameSpan.textContent = file.name;
+            const progressBar = document.createElement("div");
+            progressBar.className = "progress-bar";
+            progressDiv.appendChild(fileNameSpan);
+            progressDiv.appendChild(progressBar);
+            progressContainer.appendChild(progressDiv);
+
+            const xhr = new XMLHttpRequest();
+            xhr.open("POST", "/headline/attachmentUploads"); // 确保URL正确
+
+            // 上传进度监听
+            xhr.upload.addEventListener("progress", function (e) {
+                if (e.lengthComputable) {
+                    const percent = Math.round((e.loaded / e.total) * 100);
+                    progressBar.style.width = percent + "%";
+                }
+            });
+
+            xhr.onload = function () {
+                if (xhr.status === 200) {
+                    const response = JSON.parse(xhr.responseText);
+                    if (response.code === 200) {
+                        // 存储返回的附件ID
+                        attachmentIds.push(response.data);
+                        progressBar.style.backgroundColor = "#4CAF50"; // 绿色表示成功
+                        progressBar.textContent = " 上传成功 ✔"; // 成功提示
+                    } else {
+                        progressBar.style.backgroundColor = "#f44336"; // 红色表示失败
+                        progressBar.textContent = " 上传失败 ✖"; // 失败提示
+                    }
+                }
+            };
+
+
+            xhr.onerror = function () {
+                progressBar.style.backgroundColor = "#f44336";
+            };
+
+            xhr.send(formData);
+        }
+
+        // 发布文章逻辑（只提交文章内容和已上传的附件ID）
+        document.getElementById("publishButton").addEventListener("click", function () {
+            const formData = new FormData(document.getElementById("publishForm"));
+
+            // 获取 Quill 编辑器内容，并添加到 formData
+            const articleContent = quill.root.innerHTML.trim();
+            if (!articleContent) {
+                alert("文章内容不能为空！");
+                return;
+            }
+            formData.append("article", articleContent);
+
+            // 添加附件ID到表单数据
+            if (attachmentIds.length > 0) {
+                formData.append("attachmentIds", JSON.stringify(attachmentIds)); // 确保是 JSON 数组格式
+            }
+            console.log("发送的数据11:", formData);
+            // 发送请求
+            fetch("/headline/publish", {
+                method: "POST",
+                headers: {
+                    "token": localStorage.getItem("token")
+                },
+                body: formData
+            })
+                .then(res => res.json())
                 .then(data => {
                     if (data.code === 200) {
-                        const typeSelect = document.getElementById("type");
-                        data.data.forEach(type => {
-                            const option = document.createElement("option");
-                            option.value = type.tid; // 根据后端返回数据结构选择正确的属性
-                            option.textContent = type.tname;
-                            typeSelect.appendChild(option);
-                        });
+                        alert("文章发布成功！");
+                        window.location.reload();
                     } else {
-                        alert("无法加载类别列表，请稍后再试！");
+                        alert("错误：" + data.message);
                     }
                 })
                 .catch(error => {
-                    console.error("Error:", error);
-                    alert("请求失败，请稍后再试！");
+                    console.error("发布失败:", error);
+                    alert("发布失败，请检查网络");
                 });
         });
-
-        // 文章发布请求
-        // document.getElementById("publishButton").addEventListener("click", function () {
-        //     const title = document.getElementById("title").value;
-        //     const type = document.getElementById("type").value;
-        //     const content = quill.root.innerHTML; // 获取富文本编辑器的 HTML 内容
-        //     const image = document.getElementById("image").files[0];
-        //
-        //     const token = localStorage.getItem("token");
-        //     if (!token) {
-        //         alert("未检测到登录信息，请先登录！");
-        //         return;
-        //     }
-        //
-        //     // 使用 FormData 处理多部分表单数据
-        //     const formData = new FormData();
-        //     formData.append("title", title);
-        //     formData.append("type", type);
-        //     formData.append("article", content); // 提交 HTML 格式内容
-        //     if (image) {
-        //         formData.append("image", image); // 添加图片文件
-        //     }
-        //
-        //     fetch("/headline/publish", {
-        //         method: "POST",
-        //         headers: {
-        //             "token": token // 将 token 放入请求头
-        //         },
-        //         body: formData // 直接传递 FormData 对象
-        //     })
-        //         .then(response => response.json())
-        //         .then(data => {
-        //             if (data.code === 200) {
-        //                 alert("文章发布成功！");
-        //                 document.getElementById("publishForm").reset();
-        //                 quill.setContents([]); // 清空富文本编辑器内容
-        //             } else {
-        //                 alert("文章发布失败：" + data.msg);
-        //             }
-        //         })
-        //         .catch(error => {
-        //             console.error("Error:", error);
-        //             alert("请求失败，请稍后再试！");
-        //         });
-        // });
-
-        document.addEventListener("DOMContentLoaded", function () {
-            const publishButton = document.getElementById("publishButton");
-            const attachmentsInput = document.getElementById("attachments");
-            const progressContainer = document.getElementById("progressContainer");
-            let attachmentIds = []; // 存储所有已上传附件的ID
-
-            // 监听文件选择事件：用户选择文件后立即开始上传
-            attachmentsInput.addEventListener("change", function (e) {
-                const files = e.target.files;
-                if (files.length === 0) return;
-
-                // 清空旧数据和进度条
-                attachmentIds = [];
-                progressContainer.innerHTML = "";
-
-                // 逐个上传文件
-                Array.from(files).forEach(file => {
-                    uploadFile(file);
-                });
-            });
-
-            // 单个文件上传函数
-            function uploadFile(file) {
-                const formData = new FormData();
-                formData.append("attachment", file); // 参数名必须与后端一致
-                console.log("Uploading file:", file.name, file.size);
-
-                // 创建独立的进度条元素
-                const progressDiv = document.createElement("div");
-                progressDiv.className = "file-progress";
-                const fileNameSpan = document.createElement("span");
-                fileNameSpan.textContent = file.name;
-                const progressBar = document.createElement("div");
-                progressBar.className = "progress-bar";
-                progressDiv.appendChild(fileNameSpan);
-                progressDiv.appendChild(progressBar);
-                progressContainer.appendChild(progressDiv);
-
-                const xhr = new XMLHttpRequest();
-                xhr.open("POST", "/headline/attachmentUploads"); // 确保URL正确
-
-                // 上传进度监听
-                xhr.upload.addEventListener("progress", function (e) {
-                    if (e.lengthComputable) {
-                        const percent = Math.round((e.loaded / e.total) * 100);
-                        progressBar.style.width = percent + "%";
-                    }
-                });
-
-                xhr.onload = function () {
-                    if (xhr.status === 200) {
-                        const response = JSON.parse(xhr.responseText);
-                        if (response.code === 200) {
-                            // 存储返回的附件ID
-                            attachmentIds.push(response.data);
-                            progressBar.style.backgroundColor = "#4CAF50"; // 绿色表示成功
-                            progressBar.textContent = " 上传成功 ✔"; // 成功提示
-                        } else {
-                            progressBar.style.backgroundColor = "#f44336"; // 红色表示失败
-                            progressBar.textContent = " 上传失败 ✖"; // 失败提示
-                        }
-                    }
-                };
+    });
 
 
-                xhr.onerror = function () {
-                    progressBar.style.backgroundColor = "#f44336";
-                };
-
-                xhr.send(formData);
-            }
-
-            // 发布文章逻辑（只提交文章内容和已上传的附件ID）
-            document.getElementById("publishButton").addEventListener("click", function () {
-                const formData = new FormData(document.getElementById("publishForm"));
-
-                // 获取 Quill 编辑器内容，并添加到 formData
-                const articleContent = quill.root.innerHTML.trim();
-                if (!articleContent) {
-                    alert("文章内容不能为空！");
-                    return;
-                }
-                formData.append("article", articleContent);
-
-                // 添加附件ID到表单数据
-                if (attachmentIds.length > 0) {
-                    formData.append("attachmentIds", JSON.stringify(attachmentIds)); // 确保是 JSON 数组格式
-                }
-                console.log("发送的数据11:",formData);
-                // 发送请求
-                fetch("/headline/publish", {
-                    method: "POST",
-                    headers: {
-                        "token": localStorage.getItem("token")
-                    },
-                    body: formData
-                })
-                    .then(res => res.json())
-                    .then(data => {
-                        if (data.code === 200) {
-                            alert("文章发布成功！");
-                            window.location.reload();
-                        } else {
-                            alert("错误：" + data.message);
-                        }
-                    })
-                    .catch(error => {
-                        console.error("发布失败:", error);
-                        alert("发布失败，请检查网络");
-                    });
-            });
-        });
-
-
-
-    </script>
+</script>
 </body>
 </html>
