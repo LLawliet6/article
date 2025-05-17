@@ -57,19 +57,16 @@
         <artifactId>mysql-connector-java</artifactId>
         <version>8.0.28</version> <!-- 可以根据 MySQL 版本选择合适的驱动版本 -->
       </dependency>
-    <!-- https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-annotations -->
     <dependency>
       <groupId>com.fasterxml.jackson.core</groupId>
       <artifactId>jackson-annotations</artifactId>
       <version>2.13.2</version>
     </dependency>
-    <!-- https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-core -->
     <dependency>
       <groupId>com.fasterxml.jackson.core</groupId>
       <artifactId>jackson-core</artifactId>
       <version>2.13.2</version>
     </dependency>
-    <!-- https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-databind -->
     <dependency>
       <groupId>com.fasterxml.jackson.core</groupId>
       <artifactId>jackson-databind</artifactId>
@@ -84,7 +81,40 @@
     <dependency>
       <groupId>com.google.code.gson</groupId>
       <artifactId>gson</artifactId>
-      <version>2.8.9</version> <!-- 你可以根据需要选择其他版本 -->
+      <version>2.8.9</version>
+    </dependency>
+
+<!--    ai相关依赖-->
+    <!-- 1. OkHttp3：轻量级、高性能的 HTTP 客户端 -->
+    <dependency>
+      <groupId>com.squareup.okhttp3</groupId>
+      <artifactId>okhttp</artifactId>
+      <version>4.9.3</version>
+    </dependency>
+
+    <!-- 2. Jackson Dataformat YAML：用 Jackson 直接把 YAML 解析成 Java 对象 -->
+    <dependency>
+      <groupId>com.fasterxml.jackson.dataformat</groupId>
+      <artifactId>jackson-dataformat-yaml</artifactId>
+      <version>2.13.2</version>
+    </dependency>
+
+    <dependency>
+      <groupId>org.yaml</groupId>
+      <artifactId>snakeyaml</artifactId>
+      <version>1.30</version>
+    </dependency>
+
+    <!-- 3. SLF4J + Logback：日志框架，方便调试 HTTP 请求/响应 -->
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-api</artifactId>
+      <version>1.7.32</version>
+    </dependency>
+    <dependency>
+      <groupId>ch.qos.logback</groupId>
+      <artifactId>logback-classic</artifactId>
+      <version>1.2.6</version>
     </dependency>
 
 
