@@ -26,7 +26,7 @@ layui.use(['layer','jquery'], function(){
         } else {
             chatIndex = layer.open({
                 type: 1,
-                title: 'AI 助手',
+                title: 'deepseek v3',
                 area: ['650px','850px'],
                 offset: 'rb',
                 shade: 0.3,

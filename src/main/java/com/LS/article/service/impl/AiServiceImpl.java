@@ -8,10 +8,12 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import okhttp3.*;
 
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 
 public class AiServiceImpl implements AiService{
+
 
     private final  OkHttpClient client = new OkHttpClient.Builder()
             .connectTimeout(30, TimeUnit.SECONDS)   // 连接超时
@@ -27,32 +29,28 @@ public class AiServiceImpl implements AiService{
      * @param userMessage 前端（或 Postman）传入的用户消息
      * @return AI 返回的内容
      */
-    public String chat(String userMessage) {
+    public String chat(List<ObjectNode> messages) {
         try {
-            // 注意这里用 ObjectNode 而非 JsonNode
             ObjectNode body = mapper.createObjectNode()
                     .put("model", "deepseek-ai/DeepSeek-V3")
                     .put("stream", false)
-                    .put("max_tokens", 512)
+                    .put("max_tokens", 1024)
                     .put("enable_thinking", true)
-                    .put("thinking_budget", 4096)
-                    .put("min_p", 0.05)
                     .put("temperature", 0.7)
                     .put("top_p", 0.7)
                     .put("top_k", 50)
                     .put("frequency_penalty", 0.5)
                     .put("n", 1);
 
-            // stop: 空数组
             body.set("stop", mapper.createArrayNode());
 
-            // messages: [{ role: "user", content: userMessage }]
-            ObjectNode userMsgNode = mapper.createObjectNode()
-                    .put("role", "user")
-                    .put("content", userMessage);
-            body.set("messages", mapper.createArrayNode().add(userMsgNode));
+            // 加入所有上下文消息
+            ArrayNode msgArray = mapper.createArrayNode();
+            for (ObjectNode msg : messages) {
+                msgArray.add(msg);
+            }
+            body.set("messages", msgArray);
 
-            // 构造 HTTP 请求
             RequestBody requestBody = RequestBody.create(
                     mapper.writeValueAsString(body),
                     MediaType.get("application/json")
@@ -64,7 +62,6 @@ public class AiServiceImpl implements AiService{
                     .addHeader("Content-Type", "application/json")
                     .build();
 
-            // 执行并解析响应
             try (Response resp = client.newCall(request).execute()) {
                 String text = resp.body().string();
                 if (!resp.isSuccessful()) {
@@ -81,5 +78,6 @@ public class AiServiceImpl implements AiService{
             throw new RuntimeException("AI 调用异常：" + e.getMessage(), e);
         }
     }
+
 }
 
