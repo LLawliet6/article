@@ -3,6 +3,7 @@ package com.LS.article.controller;
 import com.LS.article.common.Result;
 import com.LS.article.service.AiService;
 import com.LS.article.service.impl.AiServiceImpl;
+import com.LS.article.util.JwtHelper;
 import com.LS.article.util.WebUtil;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -30,6 +31,12 @@ public class AiController extends BaseController {
         JsonNode reqJson = mapper.readTree(req.getInputStream());
         String userMsg = reqJson.path("message").asText("");
         String sessionId = req.getSession().getId(); // 可替换为登录用户 ID
+        String token = req.getHeader("token");
+        Long userId = JwtHelper.getUserId(token);
+        if (userId == null) {
+            WebUtil.writeJson(resp, Result.build(33, 333, "未登录"));
+            return;
+        }
 
         // 从 map 中取历史记录，没有就新建
         List<ObjectNode> history = sessionHistory.computeIfAbsent(sessionId, k -> new ArrayList<>());
@@ -47,7 +54,7 @@ public class AiController extends BaseController {
         }
 
         // 调用 AI
-        String answer = aiService.chat(history); // 传历史消息列表
+        String answer = aiService.chat(history,userId);
 
         // 添加 AI 回复到历史
         ObjectNode aiMsgNode = mapper.createObjectNode()

@@ -5,5 +5,5 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import java.util.List;
 
 public interface AiService {
-    String chat(List<ObjectNode> userMessage);
+    String chat(List<ObjectNode> userMessage, Long userId);
 }
