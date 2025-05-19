@@ -25,8 +25,6 @@
     <style>
 
 
-
-
         #editor-container {
             height: 300px;
             border: 1px solid #ced4da;
@@ -131,17 +129,24 @@
                         <!-- Quill 编辑器 -->
                         <div id="editor-container"></div>
                     </div>
+                    <button type="button" id="aiFillContent"
+                            class="layui-btn layui-btn-sm layui-btn-normal">
+                        AI 生成内容
+                    </button>
                     <div class="form-group">
                         <label for="image">上传图片</label>
                         <input type="file" class="form-control" id="image" name="image" accept="image/*"
                                style="width: 230px;">
+
                     </div>
+
                     <div class="form-group">
                         <label for="attachments">上传附件</label>
                         <!-- 支持多文件上传 -->
                         <input type="file" class="form-control" id="attachments" name="attachments" multiple>
                         <div id="progressContainer"></div>
                     </div>
+
                     <button type="button" id="publishButton" style="background-color: black; color: yellow;">发布
                     </button>
                 </form>
@@ -153,10 +158,16 @@
                         <button id="aiChatClose">×</button>
                     </div>
                     <div id="chatMessages"></div>
-                    <div id="aiChatInputArea">
-                        <input type="text" id="chatInput" placeholder="说点什么..." />
-                        <button id="chatSend" class="layui-btn layui-btn-normal layui-btn-sm">发送</button>
+                    <div id="aiChatInputArea" style="display:flex; align-items:center;">
+                        <input type="text" id="chatInput" placeholder="说点什么..." style="flex:1; margin-right:8px;"/>
+                        <button id="chatSend" class="layui-btn layui-btn-normal layui-btn-sm" style="margin-right:4px;">
+                            发送
+                        </button>
+                        <button id="chatImageSend" class="layui-btn layui-btn-warm layui-btn-sm"
+                                style="margin-right:4px;">图片
+                        </button>
                     </div>
+
                 </div>
             </div>
         </div>

@@ -64,5 +64,23 @@ public class AiController extends BaseController {
 
         WebUtil.writeJson(resp, Result.ok(answer));
     }
+    protected void image(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+        JsonNode in = mapper.readTree(req.getInputStream());
+        String prompt = in.path("prompt").asText("");
+        String neg    = in.path("negative_prompt").asText(null);
+        String imgB64 = in.path("image").asText(null);
+
+        if (prompt.isBlank()) {
+            WebUtil.writeJson(resp, Result.build(400, 400, "prompt 不能为空"));
+            return;
+        }
+
+        try {
+            List<String> urls = aiService.generateImage(prompt, neg, imgB64);
+            WebUtil.writeJson(resp, Result.ok(urls));
+        } catch (RuntimeException e) {
+            WebUtil.writeJson(resp, Result.build(null,500, e.getMessage()));
+        }
+    }
 
 }

@@ -3,6 +3,7 @@ package com.LS.article.service.impl;
 import com.LS.article.service.AiService;
 import com.LS.article.util.AiConfig;
 import com.LS.article.util.MD5Util;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
@@ -13,6 +14,7 @@ import redis.clients.jedis.JedisPool;
 import redis.clients.jedis.JedisPoolConfig;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -26,7 +28,7 @@ public class AiServiceImpl implements AiService{
             6379,
             2000,
             "root",
-            0
+            2
     );
     private static final int CACHE_TTL_SECONDS = 6 * 3600; // 缓存6小时
 
@@ -116,6 +118,58 @@ public class AiServiceImpl implements AiService{
         }
 
         return answer;
+    }
+    /**
+     * 根据提示和可选的输入图片，调用 SiliconFlow 图片生成接口
+     * @param prompt            文本提示
+     * @param negativePrompt    反向提示（可传 null）
+     * @param initImageBase64   用于图生图的 base64（可传 null）
+     * @return 生成的图片 URL 列表
+     */
+    public List<String> generateImage(String prompt,
+                                      String negativePrompt,
+                                      String initImageBase64) throws JsonProcessingException {
+
+
+        ObjectNode body = mapper.createObjectNode()
+                .put("model", "Kwai-Kolors/Kolors")
+                .put("prompt", prompt)
+                .put("negative_prompt", negativePrompt == null ? "" : negativePrompt)
+                .put("image_size", "1024x1024")
+                .put("batch_size", 1)
+                .put("seed", 4999999999L)
+                .put("num_inference_steps", 20)
+                .put("guidance_scale", 7.5);
+
+        if (initImageBase64 != null) {
+            body.put("image", initImageBase64);
+        }
+
+        RequestBody reqBody = RequestBody.create(
+                mapper.writeValueAsString(body),
+                MediaType.get("application/json")
+        );
+        Request req = new Request.Builder()
+                .url("https://api.siliconflow.cn/v1/images/generations")
+                .post(reqBody)
+                .addHeader("Authorization", "Bearer " + apiKey)
+                .addHeader("Content-Type", "application/json")
+                .build();
+
+        try (Response resp = client.newCall(req).execute()) {
+            String json = resp.body().string();
+            if (!resp.isSuccessful()) {
+                throw new RuntimeException("图片生成接口失败，HTTP " + resp.code() + "，" + json);
+            }
+            JsonNode root = mapper.readTree(json);
+            List<String> urls = new ArrayList<>();
+            for (JsonNode imgNode : root.path("images")) {
+                urls.add(imgNode.path("url").asText());
+            }
+            return urls;
+        } catch (IOException e) {
+            throw new RuntimeException("图片生成异常", e);
+        }
     }
 
 }
